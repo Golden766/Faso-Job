@@ -1,0 +1,113 @@
+/* ==========================================================================
+   Faso Job — jetons de design
+   Référence unique : couleurs, typographie, espacements, rayons, ombres.
+   ========================================================================== */
+
+:root {
+  /* Marque */
+  --fj-primary: #176391;
+  --fj-primary-strong: #0f4c73;
+  --fj-primary-soft: #6cabdd;
+  --fj-primary-pale: #eaf4fb;
+  --fj-secondary: #16845f;
+  --fj-secondary-strong: #0f6b4c;
+  --fj-secondary-pale: #e6f7f0;
+  --fj-whatsapp: #25d366;
+  --fj-whatsapp-strong: #1eaa51;
+
+  /* Neutres */
+  --fj-ink: #0f172a;
+  --fj-text: #334155;
+  --fj-muted: #64748b;
+  --fj-surface: #ffffff;
+  --fj-canvas: #f8fafc;
+  --fj-subtle: #f1f5f9;
+  --fj-border: #e2e8f0;
+  --fj-border-strong: #cbd5e1;
+
+  /* Statuts */
+  --fj-success-text: #0f6b4c;
+  --fj-success-bg: #e8f5e9;
+  --fj-success-border: #a5d6a7;
+  --fj-info-text: #2a6496;
+  --fj-info-bg: #f0f7fd;
+  --fj-info-border: #d0e5f7;
+  --fj-warning-text: #b45309;
+  --fj-warning-bg: #fef3c7;
+  --fj-warning-border: #fde68a;
+  --fj-danger-text: #b91c1c;
+  --fj-danger-bg: #fee2e2;
+  --fj-danger-border: #fecaca;
+  --fj-neutral-text: #475569;
+  --fj-neutral-bg: #f1f5f9;
+  --fj-neutral-border: #e2e8f0;
+
+  /* Typographie */
+  --fj-font: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --fj-text-xs: 0.6875rem;
+  --fj-text-sm: 0.8125rem;
+  --fj-text-md: 0.875rem;
+  --fj-text-base: 1rem;
+  --fj-text-lg: 1.125rem;
+  --fj-text-xl: 1.375rem;
+  --fj-text-2xl: 1.5rem;
+  --fj-text-3xl: 2rem;
+  --fj-text-hero: 2.5rem;
+
+  --fj-leading-tight: 1.2;
+  --fj-leading-snug: 1.35;
+  --fj-leading-normal: 1.55;
+  --fj-leading-relaxed: 1.65;
+
+  --fj-weight-regular: 400;
+  --fj-weight-medium: 500;
+  --fj-weight-semibold: 600;
+  --fj-weight-bold: 700;
+  --fj-weight-heavy: 800;
+
+  /* Espacements (grille de 4 px) */
+  --fj-space-1: 0.25rem;
+  --fj-space-2: 0.5rem;
+  --fj-space-3: 0.75rem;
+  --fj-space-4: 1rem;
+  --fj-space-5: 1.25rem;
+  --fj-space-6: 1.5rem;
+  --fj-space-8: 2rem;
+  --fj-space-10: 2.5rem;
+  --fj-space-12: 3rem;
+  --fj-space-16: 4rem;
+
+  /* Rayons */
+  --fj-radius-sm: 0.25rem;
+  --fj-radius: 0.5rem;
+  --fj-radius-md: 0.75rem;
+  --fj-radius-lg: 1rem;
+  --fj-radius-xl: 1.5rem;
+  --fj-radius-full: 9999px;
+
+  /* Ombres — stratégie « bordure d'abord » */
+  --fj-shadow-1: 0 1px 3px 0 rgba(15, 23, 42, 0.04), 0 1px 2px -1px rgba(15, 23, 42, 0.04);
+  --fj-shadow-2: 0 4px 6px -1px rgba(15, 23, 42, 0.07), 0 2px 4px -2px rgba(15, 23, 42, 0.05);
+  --fj-shadow-3: 0 20px 25px -5px rgba(15, 23, 42, 0.1), 0 8px 10px -6px rgba(15, 23, 42, 0.08);
+
+  /* Mise en page */
+  --fj-container: 80rem;
+  --fj-gutter: 1rem;
+  --fj-header-height: 4.5rem;
+  --fj-bottom-nav-height: 4rem;
+  --fj-focus-ring: 0 0 0 3px rgba(108, 171, 221, 0.32);
+  --fj-transition: 160ms ease;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --fj-gutter: 1.5rem;
+    --fj-header-height: 5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --fj-gutter: 2.5rem;
+  }
+}

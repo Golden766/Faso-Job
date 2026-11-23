@@ -1,0 +1,10 @@
+Django==6.1.2
+psycopg2-binary==2.9.13
+python-dotenv==1.2.4
+pyotp==2.10.0
+cryptography==50.0.2
+qrcode==8.2
+# Veille automatisee : acces aux pages autorisees et lecture du HTML.
+requests==2.32.5
+beautifulsoup4==4.14.2
+lxml==6.0.2

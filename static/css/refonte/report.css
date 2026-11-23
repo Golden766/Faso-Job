@@ -1,0 +1,461 @@
+/* ==========================================================================
+   Faso Job — signaler une arnaque
+   En-tête, formulaire de signalement, preuve jointe et colonne de suivi.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Fil d'Ariane et en-tête
+   -------------------------------------------------------------------------- */
+
+.fj-report-breadcrumb {
+  padding-block: var(--fj-space-3);
+  border-bottom: 1px solid var(--fj-border);
+  background: var(--fj-surface);
+}
+
+.fj-report-breadcrumb .fj-breadcrumb {
+  margin: 0;
+}
+
+.fj-report-head {
+  padding-block: var(--fj-space-5) var(--fj-space-6);
+  border-bottom: 1px solid var(--fj-border);
+  background: var(--fj-surface);
+}
+
+.fj-report-head__title {
+  max-width: 54rem;
+  margin: var(--fj-space-2) 0 var(--fj-space-2);
+  color: var(--fj-ink);
+  font-size: clamp(1.5rem, 3.5vw, 2.25rem);
+  font-weight: var(--fj-weight-heavy);
+  letter-spacing: -0.02em;
+  line-height: var(--fj-leading-tight);
+}
+
+.fj-report-head__lead {
+  max-width: 54rem;
+  margin-bottom: 0;
+}
+
+.fj-report-context {
+  display: flex;
+  align-items: center;
+  gap: var(--fj-space-3);
+  flex-wrap: wrap;
+  margin-top: var(--fj-space-4);
+  padding: var(--fj-space-3) var(--fj-space-4);
+  border: 1px solid var(--fj-border);
+  border-radius: var(--fj-radius);
+  background: var(--fj-canvas);
+}
+
+.fj-report-context__body {
+  display: grid;
+  gap: 0.1rem;
+  min-width: 0;
+  flex: 1 1 16rem;
+}
+
+.fj-report-context__label {
+  color: var(--fj-muted);
+  font-size: var(--fj-text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.fj-report-context strong {
+  color: var(--fj-ink);
+  font-size: var(--fj-text-md);
+}
+
+.fj-report-context__meta {
+  color: var(--fj-text);
+  font-size: var(--fj-text-sm);
+}
+
+/* --------------------------------------------------------------------------
+   Mise en page
+   -------------------------------------------------------------------------- */
+
+.fj-report-layout {
+  display: grid;
+  gap: var(--fj-space-5);
+  align-items: start;
+  padding-block: var(--fj-space-6) var(--fj-space-12);
+}
+
+.fj-report-main,
+.fj-report-aside {
+  display: grid;
+  gap: var(--fj-space-4);
+  align-content: start;
+  min-width: 0;
+}
+
+@media (min-width: 1024px) {
+  .fj-report-layout {
+    grid-template-columns: minmax(0, 1.65fr) minmax(18rem, 1fr);
+    gap: var(--fj-space-6);
+    padding-block: var(--fj-space-8) var(--fj-space-12);
+  }
+
+  .fj-report-aside {
+    position: sticky;
+    top: calc(var(--fj-header-height) + var(--fj-space-4));
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Règle cardinale
+   -------------------------------------------------------------------------- */
+
+.fj-report-rule {
+  align-items: flex-start;
+}
+
+.fj-report-rule p {
+  margin: 0;
+}
+
+.fj-report-rule p + p {
+  margin-top: var(--fj-space-2);
+}
+
+/* --------------------------------------------------------------------------
+   Confirmation
+   -------------------------------------------------------------------------- */
+
+.fj-report-received {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--fj-space-4);
+  padding: var(--fj-space-6);
+  border: 1px solid var(--fj-success-border);
+  border-radius: var(--fj-radius-lg);
+  background: var(--fj-success-bg);
+  color: var(--fj-text);
+}
+
+.fj-report-received__icon {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  flex: none;
+  border-radius: var(--fj-radius-full);
+  background: var(--fj-surface);
+  color: var(--fj-success-text);
+}
+
+.fj-report-received__title {
+  margin: 0 0 var(--fj-space-2);
+  color: var(--fj-success-text);
+  font-size: var(--fj-text-xl);
+  font-weight: var(--fj-weight-bold);
+}
+
+.fj-report-received p {
+  margin: 0;
+}
+
+.fj-report-received p + p {
+  margin-top: var(--fj-space-2);
+}
+
+.fj-report-received__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--fj-space-3);
+  margin-top: var(--fj-space-4);
+}
+
+/* --------------------------------------------------------------------------
+   Formulaire
+   -------------------------------------------------------------------------- */
+
+.fj-report-form {
+  gap: var(--fj-space-5);
+}
+
+.fj-report-errors {
+  align-items: flex-start;
+}
+
+.fj-report-errors ul {
+  margin: var(--fj-space-2) 0 0;
+  padding-left: 1.1rem;
+}
+
+.fj-report-errors li + li {
+  margin-top: var(--fj-space-1);
+}
+
+.fj-report-errors a {
+  color: inherit;
+  font-weight: var(--fj-weight-semibold);
+}
+
+.fj-report-card {
+  display: grid;
+  gap: var(--fj-space-4);
+  padding: var(--fj-space-4);
+  border: 1px solid var(--fj-border);
+  border-radius: var(--fj-radius-lg);
+  background: var(--fj-surface);
+  box-shadow: var(--fj-shadow-1);
+}
+
+@media (min-width: 768px) {
+  .fj-report-card {
+    gap: var(--fj-space-5);
+    padding: var(--fj-space-6);
+  }
+}
+
+.fj-report-card__head {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--fj-space-3);
+  padding-bottom: var(--fj-space-4);
+  border-bottom: 1px solid var(--fj-border);
+}
+
+.fj-report-card__number {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  flex: none;
+  border-radius: var(--fj-radius-full);
+  background: var(--fj-primary-pale);
+  color: var(--fj-primary-strong);
+  font-size: var(--fj-text-sm);
+  font-weight: var(--fj-weight-bold);
+}
+
+.fj-report-card__title {
+  margin: 0;
+  color: var(--fj-ink);
+  font-size: var(--fj-text-lg);
+  font-weight: var(--fj-weight-bold);
+  line-height: var(--fj-leading-snug);
+}
+
+.fj-report-card__description {
+  margin: 0.1rem 0 0;
+  color: var(--fj-muted);
+  font-size: var(--fj-text-sm);
+  line-height: 1.45;
+}
+
+.fj-report-fields {
+  display: grid;
+  gap: var(--fj-space-4);
+}
+
+@media (min-width: 640px) {
+  .fj-report-fields {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .fj-report-fields .fj-field--wide,
+  .fj-report-fields .fj-report-fieldset {
+    grid-column: 1 / -1;
+  }
+}
+
+.fj-report-fieldset {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.fj-report-fieldset.has-error .fj-choice {
+  border-color: var(--fj-danger-text);
+}
+
+.fj-report-reason-grid {
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 640px) {
+  .fj-report-reason-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Preuve jointe
+   -------------------------------------------------------------------------- */
+
+.fj-report-upload {
+  display: flex;
+  align-items: center;
+  gap: var(--fj-space-3);
+  flex-wrap: wrap;
+  padding: var(--fj-space-4);
+  border: 1px dashed var(--fj-border-strong);
+  border-radius: var(--fj-radius);
+  background: var(--fj-canvas);
+}
+
+.fj-report-upload__icon {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  flex: none;
+  border-radius: var(--fj-radius-full);
+  background: var(--fj-primary-pale);
+  color: var(--fj-primary-strong);
+}
+
+.fj-report-upload__copy {
+  display: grid;
+  gap: 0.1rem;
+  flex: 1 1 14rem;
+}
+
+.fj-report-upload__title {
+  color: var(--fj-ink);
+  font-size: var(--fj-text-sm);
+  font-weight: var(--fj-weight-semibold);
+}
+
+.fj-report-upload__hint {
+  color: var(--fj-muted);
+  font-size: 0.75rem;
+}
+
+.fj-report-upload .fj-file-input {
+  max-width: 100%;
+  /* 44 px de haut minimum : le champ de fichier est une cible tactile
+     (recommandation WCAG 2.5.5). */
+  min-height: 2.75rem;
+  font-size: var(--fj-text-sm);
+}
+
+.fj-report-upload .fj-file-input::file-selector-button {
+  margin-right: 0.5rem;
+  padding: 0.45rem 0.75rem;
+  border: 1px solid var(--fj-border-strong);
+  border-radius: var(--fj-radius);
+  background: var(--fj-surface);
+  color: var(--fj-ink);
+  font: inherit;
+  font-weight: var(--fj-weight-semibold);
+  cursor: pointer;
+}
+
+/* --------------------------------------------------------------------------
+   Envoi
+   -------------------------------------------------------------------------- */
+
+.fj-report-actions {
+  display: grid;
+  gap: var(--fj-space-3);
+  justify-items: start;
+  padding-block: var(--fj-space-2) var(--fj-space-4);
+}
+
+.fj-report-actions .fj-btn {
+  width: 100%;
+}
+
+.fj-report-actions p {
+  max-width: 44rem;
+  margin: 0;
+}
+
+@media (min-width: 640px) {
+  .fj-report-actions .fj-btn {
+    width: auto;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Colonne latérale
+   -------------------------------------------------------------------------- */
+
+.fj-report-panel {
+  box-shadow: none;
+}
+
+.fj-report-panel__title {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0;
+  color: var(--fj-ink);
+  font-size: var(--fj-text-md);
+  font-weight: var(--fj-weight-bold);
+}
+
+.fj-report-panel p {
+  margin: 0;
+}
+
+.fj-report-steps {
+  display: grid;
+  gap: var(--fj-space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.fj-report-steps li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--fj-space-3);
+}
+
+.fj-report-steps__number {
+  display: grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  flex: none;
+  border-radius: var(--fj-radius-full);
+  background: var(--fj-primary-pale);
+  color: var(--fj-primary-strong);
+  font-size: var(--fj-text-xs);
+  font-weight: var(--fj-weight-bold);
+}
+
+.fj-report-steps strong {
+  display: block;
+  color: var(--fj-ink);
+  font-size: var(--fj-text-sm);
+  font-weight: var(--fj-weight-semibold);
+}
+
+.fj-report-steps div span {
+  display: block;
+  margin-top: 0.1rem;
+  color: var(--fj-muted);
+  font-size: var(--fj-text-sm);
+  line-height: 1.45;
+}
+
+.fj-report-paid {
+  align-items: flex-start;
+}
+
+.fj-report-paid .fj-alert__title {
+  font-size: var(--fj-text-md);
+}
+
+.fj-report-paid__list {
+  display: grid;
+  gap: var(--fj-space-2);
+  margin: var(--fj-space-2) 0 0;
+  padding-left: 1.1rem;
+  font-size: var(--fj-text-sm);
+  line-height: 1.5;
+}
+
+.fj-report-paid__list strong {
+  color: var(--fj-ink);
+}

@@ -1,0 +1,414 @@
+/* ==========================================================================
+   Faso Job — comment ça marche
+   Parcours de vérification, référentiel des badges, lignes rouges, FAQ.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Fil d'Ariane et en-tête
+   -------------------------------------------------------------------------- */
+
+#parcours,
+#controle-des-annonces,
+#lignes-rouges,
+#faq {
+  scroll-margin-top: calc(var(--fj-header-height) + var(--fj-space-4));
+}
+
+.fj-method-breadcrumb {
+  padding-block: var(--fj-space-3);
+  border-bottom: 1px solid var(--fj-border);
+  background: var(--fj-surface);
+}
+
+.fj-method-breadcrumb .fj-breadcrumb {
+  margin: 0;
+}
+
+.fj-method-hero {
+  padding-block: var(--fj-space-5) var(--fj-space-6);
+  border-bottom: 1px solid var(--fj-border);
+  background:
+    radial-gradient(circle at 8% 0%, rgba(108, 171, 221, 0.18), transparent 45%),
+    linear-gradient(180deg, var(--fj-surface) 0%, var(--fj-canvas) 100%);
+}
+
+.fj-method-hero__title {
+  max-width: 52rem;
+  margin: var(--fj-space-2) 0 var(--fj-space-2);
+  color: var(--fj-ink);
+  font-size: clamp(1.6rem, 3.6vw, 2.4rem);
+  font-weight: var(--fj-weight-heavy);
+  letter-spacing: -0.02em;
+  line-height: var(--fj-leading-tight);
+}
+
+.fj-method-hero__lead {
+  max-width: 54rem;
+}
+
+/* --------------------------------------------------------------------------
+   Principes de la plateforme
+   -------------------------------------------------------------------------- */
+
+.fj-method-facts {
+  display: grid;
+  gap: var(--fj-space-2);
+  margin: var(--fj-space-5) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 640px) {
+  .fj-method-facts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .fj-method-facts {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.fj-method-fact {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--fj-space-3);
+  padding: var(--fj-space-3);
+  border: 1px solid var(--fj-border);
+  border-radius: var(--fj-radius);
+  background: var(--fj-surface);
+}
+
+.fj-method-fact__icon {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  flex: none;
+  border-radius: var(--fj-radius-full);
+  background: var(--fj-primary-pale);
+  color: var(--fj-primary-strong);
+}
+
+.fj-method-fact__body {
+  display: grid;
+  gap: 0.05rem;
+  min-width: 0;
+}
+
+.fj-method-fact__body strong {
+  color: var(--fj-ink);
+  font-size: var(--fj-text-sm);
+  font-weight: var(--fj-weight-semibold);
+  line-height: var(--fj-leading-snug);
+}
+
+.fj-method-fact__body span {
+  color: var(--fj-muted);
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+/* --------------------------------------------------------------------------
+   Parcours en quatre étapes
+   -------------------------------------------------------------------------- */
+
+.fj-method-steps {
+  display: grid;
+  gap: var(--fj-space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 768px) {
+  .fj-method-steps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--fj-space-5);
+  }
+}
+
+@media (min-width: 1024px) {
+  .fj-method-steps {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.fj-method-steps .fj-step {
+  height: 100%;
+}
+
+/* --------------------------------------------------------------------------
+   Référentiel des badges
+   -------------------------------------------------------------------------- */
+
+.fj-badge-reference {
+  display: grid;
+  gap: var(--fj-space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 640px) {
+  .fj-badge-reference {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .fj-badge-reference {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.fj-badge-card {
+  display: grid;
+  gap: var(--fj-space-2);
+  align-content: start;
+  padding: var(--fj-space-4);
+  border: 1px solid var(--fj-border);
+  border-radius: var(--fj-radius-lg);
+  background: var(--fj-surface);
+  box-shadow: var(--fj-shadow-1);
+}
+
+.fj-badge-card .fj-badge {
+  justify-self: start;
+  max-width: 100%;
+  height: auto;
+  min-height: 1.75rem;
+  padding-block: 0.25rem;
+  white-space: normal;
+  line-height: 1.25;
+}
+
+.fj-badge-card__title {
+  margin: var(--fj-space-1) 0 0;
+  color: var(--fj-ink);
+  font-size: var(--fj-text-base);
+  font-weight: var(--fj-weight-bold);
+  line-height: var(--fj-leading-snug);
+}
+
+.fj-badge-card p {
+  margin: 0;
+}
+
+.fj-badge-card__note {
+  padding-top: var(--fj-space-2);
+  border-top: 1px solid var(--fj-border);
+  color: var(--fj-muted);
+  font-size: 0.75rem;
+  line-height: 1.45;
+}
+
+/* --------------------------------------------------------------------------
+   Lignes rouges
+   -------------------------------------------------------------------------- */
+
+.fj-redlines {
+  display: grid;
+  gap: var(--fj-space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 768px) {
+  .fj-redlines {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.fj-redline {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--fj-space-3);
+  padding: var(--fj-space-4);
+  border: 1px solid var(--fj-danger-border);
+  border-radius: var(--fj-radius-lg);
+  background: var(--fj-surface);
+}
+
+.fj-redline__icon {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  flex: none;
+  border-radius: var(--fj-radius-full);
+  background: var(--fj-danger-bg);
+  color: var(--fj-danger-text);
+}
+
+.fj-redline__title {
+  margin: 0 0 var(--fj-space-1);
+  color: var(--fj-ink);
+  font-size: var(--fj-text-base);
+  font-weight: var(--fj-weight-bold);
+  line-height: var(--fj-leading-snug);
+}
+
+.fj-redline p {
+  margin: 0;
+  color: var(--fj-text);
+}
+
+.fj-method-callout {
+  display: flex;
+  flex-direction: column;
+  gap: var(--fj-space-3);
+  align-items: stretch;
+  margin-top: var(--fj-space-5);
+}
+
+.fj-method-callout .fj-alert {
+  flex: 1;
+}
+
+.fj-method-callout .fj-btn {
+  flex: none;
+}
+
+@media (min-width: 768px) {
+  .fj-method-callout {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Questions fréquentes
+   -------------------------------------------------------------------------- */
+
+.fj-method-faq-layout {
+  display: grid;
+  gap: var(--fj-space-5);
+  align-items: start;
+}
+
+@media (min-width: 1024px) {
+  .fj-method-faq-layout {
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    gap: var(--fj-space-8);
+  }
+
+  .fj-method-faq-intro {
+    position: sticky;
+    top: calc(var(--fj-header-height) + var(--fj-space-4));
+  }
+}
+
+.fj-method-faq-intro {
+  display: grid;
+  gap: var(--fj-space-1);
+}
+
+.fj-faq {
+  display: grid;
+  gap: var(--fj-space-2);
+}
+
+.fj-faq__item {
+  border: 1px solid var(--fj-border);
+  border-radius: var(--fj-radius);
+  background: var(--fj-surface);
+}
+
+.fj-faq__summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--fj-space-3);
+  padding: var(--fj-space-3) var(--fj-space-4);
+  color: var(--fj-ink);
+  font-size: var(--fj-text-sm);
+  font-weight: var(--fj-weight-semibold);
+  line-height: var(--fj-leading-snug);
+  list-style: none;
+  cursor: pointer;
+}
+
+.fj-faq__summary::-webkit-details-marker {
+  display: none;
+}
+
+.fj-faq__summary .fj-icon {
+  flex: none;
+  color: var(--fj-muted);
+  transition: transform var(--fj-transition);
+}
+
+.fj-faq__item[open] .fj-faq__summary .fj-icon {
+  transform: rotate(180deg);
+}
+
+.fj-faq__answer {
+  padding: 0 var(--fj-space-4) var(--fj-space-4);
+  color: var(--fj-text);
+  font-size: var(--fj-text-sm);
+  line-height: var(--fj-leading-normal);
+}
+
+.fj-faq__answer p {
+  margin: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Actions et note de bas de page
+   -------------------------------------------------------------------------- */
+
+.fj-method-actions {
+  display: grid;
+  gap: var(--fj-space-4);
+}
+
+@media (min-width: 768px) {
+  .fj-method-actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.fj-method-action {
+  display: grid;
+  gap: var(--fj-space-2);
+  align-content: start;
+  justify-items: start;
+}
+
+.fj-method-action__icon {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: var(--fj-radius-lg);
+  background: var(--fj-primary-pale);
+  color: var(--fj-primary-strong);
+}
+
+.fj-method-action__icon--danger {
+  background: var(--fj-danger-bg);
+  color: var(--fj-danger-text);
+}
+
+.fj-method-action .fj-h3 {
+  margin: 0;
+}
+
+.fj-method-action .fj-btn {
+  margin-top: var(--fj-space-1);
+}
+
+.fj-method-footnote {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--fj-space-2) var(--fj-space-3);
+  align-items: center;
+  margin: var(--fj-space-6) 0 0;
+  padding-top: var(--fj-space-4);
+  border-top: 1px solid var(--fj-border);
+  color: var(--fj-muted);
+  font-size: var(--fj-text-sm);
+}
