@@ -37,14 +37,9 @@ class BackupTestCase(TestCase):
         self.configuration.retention_count = 0
         self.configuration.save()
         self.addCleanup(shutil.rmtree, self.temp_directory, True)
-        # Les sauvegardes sont ecrites dans un dossier du projet : ce
-        # dossier doit disparaitre avec le test, sinon la racine du
-        # projet s accumule des centaines de dossiers.
-        self.addCleanup(
-            shutil.rmtree,
-            backups.project_root() / os.path.basename(self.temp_directory),
-            True,
-        )
+        # Les sauvegardes de test vont dans un dossier temporaire : il doit
+        # disparaitre avec le test, sinon il s accumule a chaque execution.
+        self.addCleanup(shutil.rmtree, self.backup_dir(), True)
 
     def backup_dir(self):
         return backups.backup_directory(self.configuration)
@@ -353,8 +348,9 @@ class RestoreCommandTest(BackupTestCase):
         self.assertEqual(Offer.objects.count(), 1)
 
 
-class BackupAdminTest(TestCase):
+class BackupAdminTest(BackupTestCase):
     def setUp(self):
+        super().setUp()
         self.user = get_user_model().objects.create_superuser(
             username='admin',
             email='admin@example.bf',
@@ -412,9 +408,6 @@ class BackupAdminTest(TestCase):
         self.assertTrue(configuration.compress)
 
     def test_manual_run_creates_a_file_and_a_history_entry(self):
-        configuration = backups.get_configuration()
-        configuration.destination = 'sauvegardes-test'
-
         response = self.client.post(
             reverse('admin-backups'),
             {'action': 'run'},

@@ -42,6 +42,9 @@ class BackupInstallTestCase(TestCase):
         self.configuration.include_media = False
         self.configuration.retention_count = 0
         self.configuration.save()
+        # Le dossier reellement utilise peut etre temporaire pendant les
+        # tests : c est lui qu il faut nettoyer.
+        self.addCleanup(shutil.rmtree, self.backup_dir(), True)
 
     def backup_dir(self):
         return backups.backup_directory(self.configuration)
