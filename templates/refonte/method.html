@@ -1,0 +1,424 @@
+{% extends "refonte/base.html" %}
+{% load static %}
+
+{% block title %}Comment ça marche — Faso Job{% endblock %}
+{% block meta_description %}Comment Faso Job collecte, vérifie et publie les offres d’emploi au Burkina Faso : parcours de contrôle, badges, motifs de refus et questions fréquentes.{% endblock %}
+{% block body_class %}has-bottom-nav has-method-page{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/refonte/method.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="fj-method-breadcrumb">
+    <div class="fj-container">
+        <nav class="fj-breadcrumb" aria-label="Fil d’Ariane">
+            <a href="{% url 'home' %}">Accueil</a>
+            <span class="fj-breadcrumb__separator" aria-hidden="true">/</span>
+            <span aria-current="page">Comment ça marche</span>
+        </nav>
+    </div>
+</div>
+
+<header class="fj-method-hero">
+    <div class="fj-container">
+        <p class="fj-eyebrow">Transparence &amp; intégrité RH au Burkina Faso</p>
+        <h1 class="fj-method-hero__title">Comment Faso Job vérifie les annonces</h1>
+        <p class="fj-lead fj-method-hero__lead">
+            De la collecte à la publication : ce que nous contrôlons, ce que signifient
+            les badges affichés sur une offre et pourquoi certaines annonces sont
+            refusées. Un badge décrit une vérification précise, jamais une promesse
+            d’embauche.
+        </p>
+
+        <ul class="fj-method-facts" aria-label="Principes de la plateforme">
+            <li class="fj-method-fact">
+                <span class="fj-method-fact__icon" aria-hidden="true">
+                    {% include "refonte/partials/icon.html" with name="lock" %}
+                </span>
+                <span class="fj-method-fact__body">
+                    <strong>Accès libre</strong>
+                    <span>Consulter les offres ne demande aucun compte.</span>
+                </span>
+            </li>
+            <li class="fj-method-fact">
+                <span class="fj-method-fact__icon" aria-hidden="true">
+                    {% include "refonte/partials/icon.html" with name="credit-card" %}
+                </span>
+                <span class="fj-method-fact__body">
+                    <strong>Gratuit pour les candidats</strong>
+                    <span>Aucun frais de dossier n’est demandé.</span>
+                </span>
+            </li>
+            <li class="fj-method-fact">
+                <span class="fj-method-fact__icon" aria-hidden="true">
+                    {% include "refonte/partials/icon.html" with name="users" %}
+                </span>
+                <span class="fj-method-fact__body">
+                    <strong>Vérification humaine</strong>
+                    <span>Chaque annonce est examinée avant publication.</span>
+                </span>
+            </li>
+            <li class="fj-method-fact">
+                <span class="fj-method-fact__icon" aria-hidden="true">
+                    {% include "refonte/partials/icon.html" with name="flag" %}
+                </span>
+                <span class="fj-method-fact__body">
+                    <strong>Signalement ouvert</strong>
+                    <span>Une annonce suspecte peut être signalée à tout moment.</span>
+                </span>
+            </li>
+        </ul>
+    </div>
+</header>
+
+<section class="fj-section" id="parcours" aria-labelledby="parcours-title">
+    <div class="fj-container">
+        <div class="fj-section-heading">
+            <div>
+                <p class="fj-eyebrow">Processus de vérification</p>
+                <h2 class="fj-h2" id="parcours-title">Le parcours d’une annonce, de la collecte à la publication</h2>
+                <p class="fj-small">
+                    Chaque annonce suit les mêmes étapes. Une offre qui ne franchit pas
+                    l’une d’elles n’est pas publiée.
+                </p>
+            </div>
+        </div>
+
+        <ol class="fj-method-steps">
+            <li class="fj-step">
+                <span class="fj-step__number" aria-hidden="true">1</span>
+                <span class="fj-step__icon">
+                    {% include "refonte/partials/icon.html" with name="search" %}
+                </span>
+                <h3 class="fj-step__title">Collecte des annonces</h3>
+                <p class="fj-small">
+                    Nous repérons les offres sur les sites d’employeurs, les pages
+                    publiques et via le formulaire de proposition. La source d’origine
+                    est enregistrée avec l’annonce.
+                </p>
+            </li>
+            <li class="fj-step">
+                <span class="fj-step__number" aria-hidden="true">2</span>
+                <span class="fj-step__icon">
+                    {% include "refonte/partials/icon.html" with name="external-link" %}
+                </span>
+                <h3 class="fj-step__title">Source et employeur</h3>
+                <p class="fj-small">
+                    L’équipe compare l’annonce à sa source et cherche à confirmer
+                    l’employeur par un contact direct. Une offre publiée doit avoir au
+                    moins une source ou un employeur vérifié.
+                </p>
+            </li>
+            <li class="fj-step">
+                <span class="fj-step__number" aria-hidden="true">3</span>
+                <span class="fj-step__icon">
+                    {% include "refonte/partials/icon.html" with name="shield-check" %}
+                </span>
+                <h3 class="fj-step__title">Conditions de candidature</h3>
+                <p class="fj-small">
+                    Nous vérifions les canaux indiqués et l’absence de frais de dossier,
+                    de caution ou de paiement obligatoire avant un entretien.
+                </p>
+            </li>
+            <li class="fj-step">
+                <span class="fj-step__number" aria-hidden="true">4</span>
+                <span class="fj-step__icon">
+                    {% include "refonte/partials/icon.html" with name="check-circle" %}
+                </span>
+                <h3 class="fj-step__title">Publication et suivi</h3>
+                <p class="fj-small">
+                    L’annonce est publiée avec ses badges. Sa disponibilité peut être
+                    reconfirmée, et l’offre fermée lorsqu’elle n’accepte plus de
+                    candidatures.
+                </p>
+            </li>
+        </ol>
+    </div>
+</section>
+
+<section class="fj-section fj-section--canvas" id="controle-des-annonces" aria-labelledby="badges-title">
+    <div class="fj-container">
+        <div class="fj-section-heading">
+            <div>
+                <p class="fj-eyebrow">Référentiel visuel</p>
+                <h2 class="fj-h2" id="badges-title">Comprendre les 5 badges d’état</h2>
+                <p class="fj-small">
+                    Un badge associe toujours une icône, une couleur et un libellé. Il
+                    indique ce qui a été vérifié sur une offre, à un moment donné.
+                </p>
+            </div>
+            <a class="fj-link" href="{% url 'catalogue' %}">
+                Consulter les offres
+                {% include "refonte/partials/icon.html" with name="arrow-right" extra_class="fj-icon--sm" %}
+            </a>
+        </div>
+
+        <ul class="fj-badge-reference">
+            <li class="fj-badge-card">
+                <span class="fj-badge fj-badge--info">
+                    {% include "refonte/partials/icon.html" with name="external-link" %} Source vérifiée
+                </span>
+                <h3 class="fj-badge-card__title">La provenance est identifiée</h3>
+                <p class="fj-small">
+                    La source d’origine de l’annonce a été identifiée et comparée au
+                    contenu publié. Le lien ou le nom de la source figure sur la fiche.
+                </p>
+                <p class="fj-badge-card__note">Ce que cela garantit : l’annonce provient bien du canal cité.</p>
+            </li>
+            <li class="fj-badge-card">
+                <span class="fj-badge fj-badge--success">
+                    {% include "refonte/partials/icon.html" with name="shield-check" %} Employeur vérifié
+                </span>
+                <h3 class="fj-badge-card__title">Le recruteur a été confirmé</h3>
+                <p class="fj-small">
+                    L’identité de l’employeur a été confirmée par un contact direct.
+                    Selon le déclarant, le badge affiche « Employeur vérifié » ou
+                    « Entreprise vérifiée ».
+                </p>
+                <p class="fj-badge-card__note">
+                    À défaut, la mention « Employeur non vérifié » signale que la
+                    confirmation n’a pas été obtenue.
+                </p>
+            </li>
+            <li class="fj-badge-card">
+                <span class="fj-badge fj-badge--success">
+                    {% include "refonte/partials/icon.html" with name="check" %} Disponibilité confirmée
+                </span>
+                <h3 class="fj-badge-card__title">L’offre était encore ouverte</h3>
+                <p class="fj-small">
+                    La disponibilité de l’offre a été confirmée. La fiche indique la
+                    date de la dernière confirmation.
+                </p>
+                <p class="fj-badge-card__note">
+                    Ce badge ne garantit pas que le poste sera pourvu.
+                </p>
+            </li>
+            <li class="fj-badge-card">
+                <span class="fj-badge fj-badge--danger">
+                    {% include "refonte/partials/icon.html" with name="alert-triangle" %} Source non vérifiée
+                </span>
+                <h3 class="fj-badge-card__title">La provenance reste incertaine</h3>
+                <p class="fj-small">
+                    La source d’origine n’a pas pu être confirmée. L’annonce n’est
+                    publiée que si l’employeur a été vérifié par un autre moyen ;
+                    sinon, elle reste hors ligne.
+                </p>
+                <p class="fj-badge-card__note">
+                    Redoublez de prudence et vérifiez les coordonnées avant de postuler.
+                </p>
+            </li>
+            <li class="fj-badge-card">
+                <span class="fj-badge fj-badge--danger">
+                    {% include "refonte/partials/icon.html" with name="x-circle" %} Candidature fermée
+                </span>
+                <h3 class="fj-badge-card__title">L’offre n’accepte plus de candidatures</h3>
+                <p class="fj-small">
+                    La date limite est passée, le poste a été pourvu ou l’annonce a été
+                    retirée. À l’inverse, « Candidature ouverte » indique que l’offre
+                    accepte encore des candidatures.
+                </p>
+                <p class="fj-badge-card__note">
+                    Une offre fermée reste consultable pour référence, sans formulaire
+                    de candidature actif.
+                </p>
+            </li>
+        </ul>
+    </div>
+</section>
+
+<section class="fj-section" id="lignes-rouges" aria-labelledby="redlines-title">
+    <div class="fj-container">
+        <div class="fj-section-heading">
+            <div>
+                <p class="fj-eyebrow">Ligne rouge infranchissable</p>
+                <h2 class="fj-h2" id="redlines-title">Tolérance zéro : 4 motifs d’exclusion immédiate</h2>
+                <p class="fj-small">
+                    Ces signaux entraînent un refus de publication. S’ils apparaissent
+                    après la mise en ligne, l’annonce est réexaminée.
+                </p>
+            </div>
+        </div>
+
+        <ol class="fj-redlines">
+            <li class="fj-redline">
+                <span class="fj-redline__icon" aria-hidden="true">
+                    {% include "refonte/partials/icon.html" with name="credit-card" %}
+                </span>
+                <div>
+                    <h3 class="fj-redline__title">1. Frais de dossier ou de badge exigés</h3>
+                    <p class="fj-small">
+                        Un recruteur légitime ne fait jamais payer un dossier, une
+                        formation, un badge ou une promesse d’embauche.
+                    </p>
+                </div>
+            </li>
+            <li class="fj-redline">
+                <span class="fj-redline__icon" aria-hidden="true">
+                    {% include "refonte/partials/icon.html" with name="phone" %}
+                </span>
+                <div>
+                    <h3 class="fj-redline__title">2. Dépôt obligatoire par Mobile Money</h3>
+                    <p class="fj-small">
+                        Une caution ou un paiement Mobile Money avant un entretien est un
+                        signal de fraude. L’annonce est refusée.
+                    </p>
+                </div>
+            </li>
+            <li class="fj-redline">
+                <span class="fj-redline__icon" aria-hidden="true">
+                    {% include "refonte/partials/icon.html" with name="building" %}
+                </span>
+                <div>
+                    <h3 class="fj-redline__title">3. Entité fictive ou identité intraçable</h3>
+                    <p class="fj-small">
+                        Entreprise sans existence vérifiable, adresse introuvable ou
+                        refus de communiquer l’identité du recruteur.
+                    </p>
+                </div>
+            </li>
+            <li class="fj-redline">
+                <span class="fj-redline__icon" aria-hidden="true">
+                    {% include "refonte/partials/icon.html" with name="users" %}
+                </span>
+                <div>
+                    <h3 class="fj-redline__title">4. Réseaux MLM et vente pyramidale</h3>
+                    <p class="fj-small">
+                        Systèmes qui imposent de recruter des membres ou d’acheter des
+                        produits pour percevoir des revenus.
+                    </p>
+                </div>
+            </li>
+        </ol>
+
+        <div class="fj-method-callout">
+            <div class="fj-alert fj-alert--danger">
+                {% include "refonte/partials/icon.html" with name="alert-triangle" %}
+                <div class="fj-alert__body">
+                    <p class="fj-alert__title">Un doute sur une annonce publiée ?</p>
+                    <p>
+                        Signalez-la. Un signalement ne modifie pas automatiquement
+                        l’offre : il déclenche une vérification humaine.
+                    </p>
+                </div>
+            </div>
+            <a class="fj-btn fj-btn--danger" href="{% url 'report_fraud' %}">
+                {% include "refonte/partials/icon.html" with name="flag" %}
+                Signaler une arnaque
+            </a>
+        </div>
+    </div>
+</section>
+
+<section class="fj-section fj-section--canvas" id="faq" aria-labelledby="faq-title">
+    <div class="fj-container fj-method-faq-layout">
+        <div class="fj-method-faq-intro">
+            <p class="fj-eyebrow">Transparence totale</p>
+            <h2 class="fj-h2" id="faq-title">Questions fréquentes sur notre méthode</h2>
+            <p class="fj-small">
+                Les réponses aux questions les plus courantes sur la vérification des
+                annonces et les conditions de candidature.
+            </p>
+        </div>
+
+        <div class="fj-faq">
+            <details class="fj-faq__item">
+                <summary class="fj-faq__summary">
+                    <span>Faso Job est-il vraiment gratuit ?</span>
+                    {% include "refonte/partials/icon.html" with name="chevron-down" extra_class="fj-icon--sm" %}
+                </summary>
+                <div class="fj-faq__answer">
+                    <p>
+                        Consulter les offres et postuler ne donne lieu à aucun paiement
+                        sur Faso Job. Proposer une annonce est également gratuit. Nous ne
+                        demandons ni frais de dossier, ni commission sur les candidatures.
+                    </p>
+                </div>
+            </details>
+            <details class="fj-faq__item">
+                <summary class="fj-faq__summary">
+                    <span>Pourquoi certaines offres n’affichent-elles pas de salaire ?</span>
+                    {% include "refonte/partials/icon.html" with name="chevron-down" extra_class="fj-icon--sm" %}
+                </summary>
+                <div class="fj-faq__answer">
+                    <p>
+                        Parce que l’employeur ne l’a pas communiqué. Une rémunération
+                        absente n’est pas, à elle seule, un signe de fraude : vérifiez la
+                        source, l’employeur et les conditions de candidature avant de
+                        postuler.
+                    </p>
+                </div>
+            </details>
+            <details class="fj-faq__item">
+                <summary class="fj-faq__summary">
+                    <span>Puis-je proposer une annonce vue sur les réseaux sociaux ?</span>
+                    {% include "refonte/partials/icon.html" with name="chevron-down" extra_class="fj-icon--sm" %}
+                </summary>
+                <div class="fj-faq__answer">
+                    <p>
+                        Oui. Utilisez le formulaire de proposition et indiquez la source
+                        d’origine ainsi que les coordonnées de l’employeur. L’annonce
+                        n’est publiée qu’après vérification.
+                    </p>
+                </div>
+            </details>
+            <details class="fj-faq__item">
+                <summary class="fj-faq__summary">
+                    <span>Comment signaler une annonce suspecte ?</span>
+                    {% include "refonte/partials/icon.html" with name="chevron-down" extra_class="fj-icon--sm" %}
+                </summary>
+                <div class="fj-faq__answer">
+                    <p>
+                        Ouvrez la fiche de l’offre et utilisez « Signaler cette offre »,
+                        ou passez par la <a class="fj-link" href="{% url 'report_fraud' %}">page de signalement</a>.
+                        Chaque signalement est examiné manuellement.
+                    </p>
+                </div>
+            </details>
+        </div>
+    </div>
+</section>
+
+<section class="fj-section" aria-labelledby="actions-title">
+    <div class="fj-container">
+        <h2 class="fj-sr-only" id="actions-title">Agir avec Faso Job</h2>
+        <div class="fj-method-actions">
+            <article class="fj-panel fj-method-action">
+                <span class="fj-method-action__icon" aria-hidden="true">
+                    {% include "refonte/partials/icon.html" with name="briefcase" %}
+                </span>
+                <h3 class="fj-h3">Vous recrutez ou avez repéré un poste ?</h3>
+                <p class="fj-small">
+                    Proposez une annonce gratuitement. Chaque proposition est examinée
+                    avant publication.
+                </p>
+                <a class="fj-btn fj-btn--primary" href="{% url 'submit_offer' %}">
+                    Proposer une annonce
+                    {% include "refonte/partials/icon.html" with name="arrow-right" %}
+                </a>
+            </article>
+
+            <article class="fj-panel fj-method-action">
+                <span class="fj-method-action__icon fj-method-action__icon--danger" aria-hidden="true">
+                    {% include "refonte/partials/icon.html" with name="flag" %}
+                </span>
+                <h3 class="fj-h3">Vous observez un comportement suspect ?</h3>
+                <p class="fj-small">
+                    Signalez une annonce ou un contact frauduleux. Votre identité reste
+                    privée et le signalement est examiné par une personne.
+                </p>
+                <a class="fj-btn fj-btn--secondary" href="{% url 'report_fraud' %}">
+                    Signaler une arnaque
+                    {% include "refonte/partials/icon.html" with name="arrow-right" %}
+                </a>
+            </article>
+        </div>
+
+        <p class="fj-method-footnote">
+            Faso Job applique des principes de transparence, de gratuité pour les
+            candidats et de non-discrimination.
+            <a class="fj-link" href="{% url 'catalogue' %}">Consulter les offres publiées</a>
+        </p>
+    </div>
+</section>
+{% endblock %}

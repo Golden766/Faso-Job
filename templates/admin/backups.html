@@ -1,0 +1,296 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block title %}{{ title }} | Faso Job — Administration{% endblock %}
+
+{% block bodyclass %}{{ block.super }} editorial-dashboard backups{% endblock %}
+
+{% block content_title %}{% endblock %}
+{% block content_subtitle %}{% endblock %}
+
+{% block content %}
+<div class="dashboard-main">
+        <div class="dashboard-page-heading">
+            <div>
+                <p class="dashboard-eyebrow">Continuité de service</p>
+                <h1>Sauvegardes</h1>
+                <p>
+                    Configurez ici tout ce qui se configure, et lancez une
+                    sauvegarde quand vous le souhaitez.
+                </p>
+            </div>
+            <div class="dashboard-heading-actions">
+                <a class="dashboard-secondary-action" href="{% url 'admin:index' %}">
+                    Retour au tableau de bord
+                </a>
+            </div>
+        </div>
+
+        <section class="dashboard-section" aria-labelledby="state-title">
+            <div class="dashboard-section-heading">
+                <h2 id="state-title">État</h2>
+                <span>La sauvegarde automatique s’active sur le serveur, pas depuis cette page.</span>
+            </div>
+
+            {% if configuration.enabled %}
+                <div class="dashboard-alert dashboard-alert--calm">
+                    <span class="dashboard-alert__icon" aria-hidden="true">✓</span>
+                    <span class="dashboard-alert__body">
+                        <strong>Sauvegarde automatique activée</strong>
+                        <span>
+                            {% if configuration.last_run_at %}
+                            Dernière sauvegarde : {{ configuration.last_run_at|date:"d/m/Y à H:i" }}.
+                            {% else %}
+                            Aucune sauvegarde enregistrée pour l’instant.
+                            {% endif %}
+                        </span>
+                    </span>
+                </div>
+            {% else %}
+                <div class="dashboard-alert">
+                    <span class="dashboard-alert__icon" aria-hidden="true">!</span>
+                    <span class="dashboard-alert__body">
+                        <strong>Sauvegarde automatique désactivée</strong>
+                        <span>
+                            Tant que la tâche planifiée n’est pas installée sur le serveur,
+                            aucune sauvegarde automatique n’est produite. Vous pouvez
+                            continuer à sauvegarder manuellement ci-dessous.
+                        </span>
+                    </span>
+                </div>
+            {% endif %}
+        </section>
+
+        <section class="dashboard-section" aria-labelledby="run-title">
+            <div class="dashboard-section-heading">
+                <h2 id="run-title">Sauvegarder maintenant</h2>
+                <span>Produit un fichier de sauvegarde immédiat et l’ajoute à l’historique.</span>
+            </div>
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="run">
+                <div class="submit-row">
+                    <input type="submit" value="Lancer une sauvegarde">
+                </div>
+            </form>
+        </section>
+
+        <section class="dashboard-section" aria-labelledby="install-title">
+            <div class="dashboard-section-heading">
+                <h2 id="install-title">Installer une sauvegarde</h2>
+                <span>Replace les données du site par celles d’une sauvegarde.</span>
+            </div>
+
+            <div class="dashboard-alert">
+                <span class="dashboard-alert__icon" aria-hidden="true">!</span>
+                <span class="dashboard-alert__body">
+                    <strong>Opération destructive</strong>
+                    <span>
+                        L’installation remplace le contenu de la base. Un aperçu
+                        montre d’abord ce qui sera écrit, une sauvegarde de sécurité
+                        est produite avant l’écriture, et vous devez recopier un mot
+                        de confirmation pour valider.
+                    </span>
+                </span>
+            </div>
+
+            <h3 class="backup-subtitle">Depuis un fichier du serveur</h3>
+            <p class="backup-subtitle__help">
+                La liste des fichiers présents se trouve plus bas. Chaque bouton
+                « Installer » ouvre l’aperçu d’une sauvegarde.
+            </p>
+
+            <h3 class="backup-subtitle">En déposant un fichier</h3>
+            <form method="post" enctype="multipart/form-data" class="backup-upload-form">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="upload">
+                <div class="form-row">
+                    <label for="id_backup_file">Fichier de sauvegarde :</label>
+                    <input type="file" name="backup_file" id="id_backup_file"
+                           accept=".json,.gz,.zip">
+                    <p class="help">
+                        Formats acceptés : .json, .json.gz, .zip. {{ max_upload_mo }} Mo maximum.
+                        Le fichier est déposé dans le dossier de sauvegardes puis
+                        ouvert en aperçu : rien n’est écrit sans votre confirmation.
+                    </p>
+                </div>
+                <div class="submit-row">
+                    <input type="submit" value="Déposer le fichier">
+                </div>
+            </form>
+        </section>
+
+        <section class="dashboard-section" aria-labelledby="config-title">
+            <div class="dashboard-section-heading">
+                <h2 id="config-title">Configuration</h2>
+                <span>Destination, nombre de copies conservées, fréquence et format.</span>
+            </div>
+            <form method="post" class="backup-config-form">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="save">
+
+                <div class="form-row">
+                    <label for="id_destination">Dossier de destination :</label>
+                    <input type="text" name="destination" id="id_destination"
+                           value="{{ configuration.destination }}" maxlength="80">
+                    <p class="help">Dossier du projet où sont écrites les sauvegardes. Ne pas mettre de chemin.</p>
+                </div>
+
+                <div class="form-row">
+                    <label for="id_filename_prefix">Préfixe des fichiers :</label>
+                    <input type="text" name="filename_prefix" id="id_filename_prefix"
+                           value="{{ configuration.filename_prefix }}" maxlength="40">
+                    <p class="help">Les fichiers sont horodés : {{ configuration.filename_prefix }}-2026-11-12-030000.json</p>
+                </div>
+
+                <div class="form-row">
+                    <label for="id_retention_count">Nombre de sauvegardes conservées :</label>
+                    <input type="number" name="retention_count" id="id_retention_count"
+                           value="{{ configuration.retention_count }}" min="0">
+                    <p class="help">Les plus anciennes sont supprimées. 0 conserve tout.</p>
+                </div>
+
+                <div class="form-row">
+                    <label for="id_frequency">Fréquence souhaitée :</label>
+                    <select name="frequency" id="id_frequency">
+                        {% for value, label in configuration.FREQUENCY_CHOICES %}
+                            <option value="{{ value }}"{% if configuration.frequency == value %} selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    <p class="help">Utilisée pour proposer la bonne commande d’activation ci-dessous.</p>
+                </div>
+
+                <div class="form-row">
+                    <label for="id_compress"> compresser les fichiers</label>
+                    <input type="checkbox" name="compress" id="id_compress"{% if configuration.compress %} checked{% endif %}>
+                </div>
+
+                <div class="form-row">
+                    <label for="id_include_media"> inclure les fichiers joints (preuves)</label>
+                    <input type="checkbox" name="include_media" id="id_include_media"{% if configuration.include_media %} checked{% endif %}>
+                    <p class="help">Ces fichiers contiennent des données personnelles. Ils ne sont jamais servis publiquement.</p>
+                </div>
+
+                <div class="form-row">
+                    <label for="id_enabled"> sauvegarde automatique activée</label>
+                    <input type="checkbox" name="enabled" id="id_enabled"{% if configuration.enabled %} checked{% endif %}>
+                    <p class="help">À cocher une fois la tâche planifiée installée sur le serveur.</p>
+                </div>
+
+                <div class="submit-row">
+                    <input type="submit" value="Enregistrer la configuration">
+                </div>
+            </form>
+        </section>
+
+        <section class="dashboard-section" aria-labelledby="activate-title">
+            <div class="dashboard-section-heading">
+                <h2 id="activate-title">Activer l’automatisation</h2>
+                <span>Une seule étape, à faire sur le serveur qui héberge le site.</span>
+            </div>
+
+            <div class="backup-activation">
+                <p>
+                    La fréquence souhaitée est <strong>{{ instructions.schedule_text }}</strong>.
+                    Copiez la commande ci-dessous dans la tâche planifiée de votre serveur.
+                </p>
+
+                <h3>Sous Linux (cron)</h3>
+                <pre class="backup-code"><code>{{ instructions.cron_command }}</code></pre>
+
+                <h3>Sous Windows (Tâche planifiée)</h3>
+                <pre class="backup-code"><code>{{ instructions.schtasks_command }}</code></pre>
+
+                <p class="backup-activation__note">
+                    Une fois la tâche installée, cochez « sauvegarde automatique activée »
+                    ci-dessus : la commande automatique respecte alors ce réglage.
+                </p>
+            </div>
+        </section>
+
+        <section class="dashboard-section" aria-labelledby="history-title">
+            <div class="dashboard-section-heading">
+                <h2 id="history-title">Historique</h2>
+                <span>Les vingt dernières opérations : sauvegardes et installations.</span>
+            </div>
+            <div class="recent-offers-wrap">
+                <table class="recent-offers activity-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Origine</th>
+                            <th>Par</th>
+                            <th>Résultat</th>
+                            <th>Taille</th>
+                            <th>Détail</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for run in runs %}
+                        <tr>
+                            <td>{{ run.started_at|date:"d/m/Y H:i" }}</td>
+                            <td>{{ run.get_triggered_by_display }}</td>
+                            <td>{{ run.actor|default:"—" }}</td>
+                            <td>{{ run.get_status_display }}</td>
+                            <td>{% if run.file_size %}{{ run.file_size|filesizeformat }}{% else %}—{% endif %}</td>
+                            <td>{{ run.message }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6">Aucune sauvegarde enregistrée pour le moment.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="dashboard-section" aria-labelledby="files-title">
+            <div class="dashboard-section-heading">
+                <h2 id="files-title">Fichiers présents</h2>
+                <span>Les sauvegardes disponibles sur le serveur.</span>
+            </div>
+            {% if has_files %}
+                <div class="recent-offers-wrap">
+                    <table class="recent-offers activity-table">
+                        <thead>
+                            <tr>
+                                <th>Fichier</th>
+                                <th>Taille</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for file in backup_files %}
+                            <tr>
+                                <td>{{ file.name }}</td>
+                                <td>{{ file.size|filesizeformat }}</td>
+                                <td>
+                                    <a class="dashboard-secondary-action"
+                                       href="{% url 'admin-backup-restore' file.name %}">
+                                        Installer
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="empty">Aucun fichier de sauvegarde pour le moment.</p>
+            {% endif %}
+        </section>
+
+        <aside class="dashboard-help">
+            <span class="dashboard-help-icon" aria-hidden="true">i</span>
+            <p>
+                <strong>Restaurer :</strong> l’installation d’une sauvegarde se
+                fait depuis cette page, bouton « Installer ». La commande
+                <code>manage.py restore_database &lt;fichier&gt;</code> fait la
+                même chose et simule la restauration par défaut : elle n’écrit
+                rien sans l’option <code>--apply</code>. Une sauvegarde de la
+                base avant restauration reste prudent.
+            </p>
+        </aside>
+    </div>
+{% endblock %}

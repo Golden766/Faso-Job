@@ -1,0 +1,40 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#176391">
+    <meta name="description" content="{% block meta_description %}Faso Job — opportunités professionnelles au Burkina Faso : offres d’emploi, stages et missions avec leur source et leurs modalités de candidature.{% endblock %}">
+    <title>{% block title %}Faso Job — Opportunités professionnelles au Burkina Faso{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/refonte/tokens.css' %}">
+    <link rel="stylesheet" href="{% static 'css/refonte/base.css' %}">
+    <link rel="stylesheet" href="{% static 'css/refonte/components.css' %}">
+    <link rel="stylesheet" href="{% static 'css/refonte/pages.css' %}">
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="{% block body_class %}has-bottom-nav{% endblock %}">
+    <div id="fj-page-loader" class="fj-page-loader" hidden aria-live="polite" aria-busy="true">
+        <div class="fj-page-loader__content">
+            <span class="fj-page-loader__spinner" aria-hidden="true"></span>
+            <span class="fj-page-loader__label">Chargement…</span>
+        </div>
+    </div>
+
+    {% include "refonte/partials/icons.html" %}
+    <a class="fj-skip-link" href="#contenu">Aller au contenu</a>
+    {% include "refonte/partials/header.html" %}
+    {% include "refonte/partials/messages.html" %}
+
+    <main id="contenu" class="fj-main">
+        <div class="fj-container fj-favorites-status" data-favorites-status role="status" aria-live="polite" hidden></div>
+        {% block content %}{% endblock %}
+    </main>
+
+    {% include "refonte/partials/footer.html" %}
+    {% include "refonte/partials/mobile_nav.html" %}
+    <script src="{% static 'js/favorites.js' %}?v=20261113-2" defer></script>
+    <script src="{% static 'js/public_loading.js' %}?v=20261114-1" defer></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

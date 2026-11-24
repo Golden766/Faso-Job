@@ -1,0 +1,241 @@
+{% extends "refonte/base.html" %}
+{% load static %}
+
+{% block title %}{{ title }} — Faso Job{% endblock %}
+{% block meta_description %}Parcourez les offres d’emploi, stages et missions au Burkina Faso : filtrez par ville, type de contrat, rémunération et date limite sur Faso Job.{% endblock %}
+
+{% block content %}
+<section class="fj-page-head">
+    <div class="fj-container">
+        <nav class="fj-breadcrumb" aria-label="Fil d’Ariane">
+            <a href="{% url 'home' %}">Accueil</a>
+            <span class="fj-breadcrumb__separator" aria-hidden="true">/</span>
+            <span aria-current="page">Offres</span>
+        </nav>
+
+        <div class="fj-page-head__row">
+            <div class="fj-page-head__copy">
+                <p class="fj-eyebrow">Répertoire public</p>
+                <h1 class="fj-h1">Toutes les opportunités</h1>
+                <p class="fj-body">
+                    Emplois, stages et missions publiés au Burkina Faso, avec leur
+                    source et leurs modalités de candidature.
+                </p>
+            </div>
+            <a class="fj-btn fj-btn--primary" href="{% url 'submit_offer' %}">
+                {% include "refonte/partials/icon.html" with name="plus" %}
+                Proposer une annonce
+            </a>
+        </div>
+    </div>
+</section>
+
+<div class="fj-container fj-catalogue">
+    <aside class="fj-catalogue__aside" aria-label="Filtres de recherche">
+        <form class="fj-filter-panel" method="get" action="{% url 'catalogue' %}">
+            <div class="fj-filter-panel__head">
+                <h2 class="fj-h3">Rechercher et filtrer</h2>
+                <a class="fj-small fj-filter-panel__reset" href="{% url 'catalogue' %}">Réinitialiser</a>
+            </div>
+
+            <input type="hidden" name="sort" value="{{ sort }}">
+            {% include "refonte/partials/catalogue_filters.html" %}
+
+            <div class="fj-filter-actions">
+                <button class="fj-btn fj-btn--primary fj-btn--block" type="submit">
+                    {% include "refonte/partials/icon.html" with name="filter" %}
+                    <span class="fj-btn__label">Appliquer les filtres</span>
+                </button>
+                {% if has_filters %}
+                    <a class="fj-btn fj-btn--ghost fj-btn--block" href="{% url 'catalogue' %}">Effacer les filtres</a>
+                {% endif %}
+            </div>
+        </form>
+    </aside>
+
+    <div class="fj-catalogue__main">
+        <div class="fj-catalogue__mobile-bar">
+            <form class="fj-mobile-search" method="get" action="{% url 'catalogue' %}" role="search">
+                <label class="fj-sr-only" for="mobile-catalogue-search">Rechercher une offre</label>
+                {% include "refonte/partials/icon.html" with name="search" extra_class="fj-search__icon" %}
+                <input
+                    class="fj-input fj-search__control"
+                    id="mobile-catalogue-search"
+                    type="search"
+                    name="q"
+                    value="{{ keyword }}"
+                    placeholder="Rechercher une offre"
+                    autocomplete="off"
+                >
+                {% if location %}<input type="hidden" name="location" value="{{ location }}">{% endif %}
+                {% if opportunity_type %}<input type="hidden" name="type" value="{{ opportunity_type }}">{% endif %}
+                {% if request.GET.source_verified == '1' %}<input type="hidden" name="source_verified" value="1">{% endif %}
+                {% if request.GET.availability_confirmed == '1' %}<input type="hidden" name="availability_confirmed" value="1">{% endif %}
+                {% if salary_min %}<input type="hidden" name="salary_min" value="{{ salary_min }}">{% endif %}
+                {% if salary_max %}<input type="hidden" name="salary_max" value="{{ salary_max }}">{% endif %}
+                {% if deadline_from %}<input type="hidden" name="deadline_from" value="{{ deadline_from }}">{% endif %}
+                {% if deadline_to %}<input type="hidden" name="deadline_to" value="{{ deadline_to }}">{% endif %}
+                <input type="hidden" name="sort" value="{{ sort }}">
+                <button class="fj-btn fj-btn--primary" type="submit"><span class="fj-btn__label">Rechercher</span></button>
+            </form>
+            <button class="fj-btn fj-btn--secondary fj-filter-open" type="button" aria-controls="catalogue-filters">
+                {% include "refonte/partials/icon.html" with name="filter" %}
+                Filtres
+                <span
+                    class="fj-filter-open__count"
+                    data-filter-count
+                    aria-live="polite"
+                    {% if not active_filters %}hidden{% endif %}
+                >{{ active_filters|length }}</span>
+            </button>
+        </div>
+
+        <nav class="fj-tabs" aria-label="Filtrer par type d’opportunité">
+            {% for tab in type_tabs %}
+                <a class="fj-tab{% if tab.active %} is-active{% endif %}" href="{{ tab.url }}"{% if tab.active %} aria-current="page"{% endif %}>
+                    {{ tab.label }}
+                    <span class="fj-tab__count">{{ tab.count }}</span>
+                </a>
+            {% endfor %}
+        </nav>
+
+        <div class="fj-results-bar">
+            <div>
+                <h2 class="fj-h3">Résultats</h2>
+                <p class="fj-small">
+                    {{ result_count }} offre{{ result_count|pluralize }} correspond{{ result_count|pluralize:"ent" }} à votre recherche
+                </p>
+            </div>
+
+            <form class="fj-sort" method="get" action="{% url 'catalogue' %}">
+                {% if keyword %}<input type="hidden" name="q" value="{{ keyword }}">{% endif %}
+                {% if location %}<input type="hidden" name="location" value="{{ location }}">{% endif %}
+                {% if opportunity_type %}<input type="hidden" name="type" value="{{ opportunity_type }}">{% endif %}
+                {% if request.GET.source_verified == '1' %}<input type="hidden" name="source_verified" value="1">{% endif %}
+                {% if request.GET.availability_confirmed == '1' %}<input type="hidden" name="availability_confirmed" value="1">{% endif %}
+                {% if salary_min %}<input type="hidden" name="salary_min" value="{{ salary_min }}">{% endif %}
+                {% if salary_max %}<input type="hidden" name="salary_max" value="{{ salary_max }}">{% endif %}
+                {% if deadline_from %}<input type="hidden" name="deadline_from" value="{{ deadline_from }}">{% endif %}
+                {% if deadline_to %}<input type="hidden" name="deadline_to" value="{{ deadline_to }}">{% endif %}
+                <label class="fj-sort__label" for="catalogue-sort">Trier&nbsp;:</label>
+                <select class="fj-select fj-select--sm" id="catalogue-sort" name="sort">
+                    <option value="recent"{% if sort == 'recent' %} selected{% endif %}>Plus récentes</option>
+                    <option value="deadline"{% if sort == 'deadline' %} selected{% endif %}>Date limite proche</option>
+                    <option value="verified"{% if sort == 'verified' %} selected{% endif %}>Vérifiées en priorité</option>
+                    <option value="salary"{% if sort == 'salary' %} selected{% endif %}>Rémunération</option>
+                </select>
+                <button class="fj-btn fj-btn--secondary fj-btn--sm" type="submit"><span class="fj-btn__label">Trier</span></button>
+            </form>
+        </div>
+
+        {% if active_filters %}
+            <div class="fj-active-filters" aria-label="Filtres actifs">
+                <span class="fj-small">Filtres actifs&nbsp;:</span>
+                {% for filter in active_filters %}
+                    <a class="fj-chip fj-chip--outline fj-chip--removable" href="{{ filter.remove_url }}">
+                        {{ filter.label }}
+                        <span aria-hidden="true">×</span>
+                        <span class="fj-sr-only">Retirer ce filtre</span>
+                    </a>
+                {% endfor %}
+                <a class="fj-small fj-active-filters__clear" href="{% url 'catalogue' %}">Tout effacer</a>
+            </div>
+        {% endif %}
+
+        {% if offers %}
+            <div class="fj-catalogue__list" data-offers-list>
+                {% for offer in offers %}
+                    {% include "refonte/partials/offer_card.html" with offer=offer %}
+                {% endfor %}
+            </div>
+
+            {% if page_obj.has_other_pages %}
+                <nav class="fj-pagination" aria-label="Pagination des offres">
+                    {% if page_obj.has_previous %}
+                        <a
+                            class="fj-pagination__link"
+                            href="?{% if querystring %}{{ querystring|safe }}&{% endif %}page={{ page_obj.previous_page_number }}"
+                            aria-label="Page précédente"
+                        >
+                            {% include "refonte/partials/icon.html" with name="chevron-left" %}
+                        </a>
+                    {% else %}
+                        <span class="fj-pagination__link" aria-disabled="true">
+                            {% include "refonte/partials/icon.html" with name="chevron-left" %}
+                        </span>
+                    {% endif %}
+
+                    {% for number in page_range %}
+                        {% if number == paginator.ELLIPSIS %}
+                            <span class="fj-pagination__link" aria-hidden="true">…</span>
+                        {% elif number == page_obj.number %}
+                            <span class="fj-pagination__link is-active" aria-current="page">{{ number }}</span>
+                        {% else %}
+                            <a
+                                class="fj-pagination__link"
+                                href="?{% if querystring %}{{ querystring|safe }}&{% endif %}page={{ number }}"
+                            >{{ number }}</a>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                        <a
+                            class="fj-pagination__link"
+                            href="?{% if querystring %}{{ querystring|safe }}&{% endif %}page={{ page_obj.next_page_number }}"
+                            aria-label="Page suivante"
+                        >
+                            {% include "refonte/partials/icon.html" with name="chevron-right" %}
+                        </a>
+                    {% else %}
+                        <span class="fj-pagination__link" aria-disabled="true">
+                            {% include "refonte/partials/icon.html" with name="chevron-right" %}
+                        </span>
+                    {% endif %}
+                </nav>
+            {% endif %}
+        {% else %}
+            <div class="fj-empty">
+                <span class="fj-empty__icon">
+                    {% include "refonte/partials/icon.html" with name="search" extra_class="fj-icon--lg" %}
+                </span>
+                <p class="fj-h3">Aucune offre ne correspond à ces critères</p>
+                <p class="fj-small">
+                    Élargissez la recherche ou retirez certains filtres pour retrouver
+                    davantage d’opportunités.
+                </p>
+                {% if has_filters %}
+                    <a class="fj-btn fj-btn--secondary" href="{% url 'catalogue' %}">Effacer les filtres</a>
+                {% else %}
+                    <a class="fj-btn fj-btn--primary" href="{% url 'submit_offer' %}">Proposer une annonce</a>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<dialog class="fj-dialog fj-filters-dialog" id="catalogue-filters" aria-labelledby="catalogue-filters-title">
+    <div class="fj-dialog__header">
+        <h2 class="fj-h3" id="catalogue-filters-title">Rechercher et filtrer</h2>
+        <button class="fj-btn fj-btn--secondary fj-btn--sm filters-close" type="button" aria-label="Fermer les filtres">
+            {% include "refonte/partials/icon.html" with name="x" %}
+        </button>
+    </div>
+    <form class="fj-dialog__body fj-filter-panel" method="get" action="{% url 'catalogue' %}">
+        <input type="hidden" name="sort" value="{{ sort }}">
+        {% include "refonte/partials/catalogue_filters.html" %}
+        <div class="fj-filter-actions">
+            <button class="fj-btn fj-btn--primary fj-btn--block" type="submit">
+                {% include "refonte/partials/icon.html" with name="filter" %}
+                Appliquer les filtres
+            </button>
+            {% if has_filters %}
+                <a class="fj-btn fj-btn--ghost fj-btn--block" href="{% url 'catalogue' %}">Effacer les filtres</a>
+            {% endif %}
+        </div>
+    </form>
+</dialog>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/catalogue.js' %}?v=20261113-1" defer></script>
+{% endblock %}

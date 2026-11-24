@@ -1,0 +1,343 @@
+{% extends "refonte/base.html" %}
+{% load static %}
+
+{% block title %}Signaler une arnaque — Faso Job{% endblock %}
+{% block meta_description %}Signalez une offre frauduleuse, une demande de frais ou une usurpation d’identité au Burkina Faso. Chaque signalement est examiné par l’équipe Faso Job.{% endblock %}
+{% block body_class %}has-bottom-nav has-report-page{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/refonte/report.css' %}">
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/report_fraud.js' %}?v=20261109-1" defer></script>
+{% endblock %}
+
+{% block content %}
+<div class="fj-report-breadcrumb">
+    <div class="fj-container">
+        <nav class="fj-breadcrumb" aria-label="Fil d’Ariane">
+            <a href="{% url 'home' %}">Accueil</a>
+            <span class="fj-breadcrumb__separator" aria-hidden="true">/</span>
+            {% if offer %}
+                <a href="{% url 'offer_detail' offer.slug %}">Offres</a>
+                <span class="fj-breadcrumb__separator" aria-hidden="true">/</span>
+                <span aria-current="page">Signaler cette offre</span>
+            {% else %}
+                <span aria-current="page">Signaler une arnaque</span>
+            {% endif %}
+        </nav>
+    </div>
+</div>
+
+<header class="fj-report-head">
+    <div class="fj-container">
+        <p class="fj-eyebrow">Plateforme citoyenne de salubrité publique</p>
+        <h1 class="fj-report-head__title">Signalez une arnaque ou une offre frauduleuse</h1>
+        <p class="fj-lead fj-report-head__lead">
+            Protégez les chercheurs d’emploi au Burkina Faso. Chaque signalement est
+            examiné manuellement par notre équipe. Il ne modifie pas automatiquement
+            le statut d’une offre.
+        </p>
+
+        {% if offer %}
+            <div class="fj-report-context" aria-label="Offre concernée par le signalement">
+                {% include "refonte/partials/icon.html" with name="briefcase" extra_class="fj-icon--sm" %}
+                <div class="fj-report-context__body">
+                    <span class="fj-report-context__label">Signalement lié à cette offre</span>
+                    <strong>{{ offer.title }}</strong>
+                    <span class="fj-report-context__meta">
+                        {{ offer.company_name }}{% if offer.location %} · {{ offer.location }}{% endif %}
+                    </span>
+                </div>
+                <a class="fj-link" href="{% url 'offer_detail' offer.slug %}">Revoir l’offre</a>
+            </div>
+        {% endif %}
+    </div>
+</header>
+
+<div class="fj-container fj-report-layout">
+    <div class="fj-report-main">
+        <section class="fj-alert fj-alert--danger fj-report-rule" aria-labelledby="rule-title">
+            {% include "refonte/partials/icon.html" with name="alert-triangle" extra_class="fj-icon--sm" %}
+            <div class="fj-alert__body">
+                <p class="fj-alert__title" id="rule-title">Règle cardinale : tolérance zéro</p>
+                <p>
+                    Un recruteur légitime, une institution publique ou une organisation
+                    sérieuse ne demande jamais d’argent pour un dossier, une formation,
+                    un badge ou une promesse d’embauche. Une demande de paiement par
+                    Mobile Money, Wave ou espèces doit vous alerter.
+                </p>
+                <p>
+                    Le paiement ne garantit jamais une embauche. Si on vous le demande,
+                    signalez-le et n’envoyez pas d’argent.
+                </p>
+            </div>
+        </section>
+
+        {% if received %}
+            <section class="fj-report-received" aria-labelledby="received-title">
+                <span class="fj-report-received__icon" aria-hidden="true">
+                    {% include "refonte/partials/icon.html" with name="check-circle" %}
+                </span>
+                <div>
+                    <h2 class="fj-report-received__title" id="received-title">
+                        Votre signalement a bien été enregistré.
+                    </h2>
+                    <p>
+                        Notre équipe l’examine manuellement. Si vous avez laissé un
+                        e-mail ou un téléphone, nous pourrons vous contacter pour un
+                        complément d’information.
+                    </p>
+                    <p class="fj-small fj-text-muted">
+                        Aucun changement de statut n’est appliqué automatiquement à
+                        l’offre signalée. Une suspension éventuelle reste une décision
+                        humaine.
+                    </p>
+                    <div class="fj-report-received__actions">
+                        {% if offer %}
+                            <a class="fj-btn fj-btn--secondary" href="{% url 'offer_detail' offer.slug %}">
+                                Revenir à l’offre
+                            </a>
+                        {% endif %}
+                        <a class="fj-btn fj-btn--primary" href="{% url 'catalogue' %}">
+                            Consulter les offres
+                        </a>
+                        <a class="fj-link" href="{% if offer %}{% url 'report_offer' offer.slug %}{% else %}{% url 'report_fraud' %}{% endif %}">
+                            Faire un autre signalement
+                        </a>
+                    </div>
+                </div>
+            </section>
+        {% else %}
+            {% if form.errors %}
+                <div class="fj-alert fj-alert--danger fj-report-errors" role="alert" tabindex="-1" data-error-summary>
+                    {% include "refonte/partials/icon.html" with name="alert-triangle" extra_class="fj-icon--sm" %}
+                    <div class="fj-alert__body">
+                        <p class="fj-alert__title">Votre signalement n’a pas pu être envoyé.</p>
+                        <p>Corrigez les points suivants, puis renvoyez le formulaire.</p>
+                        <ul>
+                            {% for field in form %}
+                                {% if field.errors %}
+                                    <li>
+                                        <a href="#{{ field.auto_id }}">{{ field.label }}</a> :
+                                        {{ field.errors.0 }}
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                            {% for error in form.non_field_errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            {% endif %}
+
+            <form class="fj-form fj-report-form" method="post" enctype="multipart/form-data" novalidate
+                  action="{% if offer %}{% url 'report_offer' offer.slug %}{% else %}{% url 'report_fraud' %}{% endif %}">
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                    <div class="fj-alert fj-alert--danger" role="alert">
+                        {% include "refonte/partials/icon.html" with name="alert-triangle" extra_class="fj-icon--sm" %}
+                        <div class="fj-alert__body">
+                            {% for error in form.non_field_errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+
+                {% for section in form.numbered_sections %}
+                    <section class="fj-report-card" aria-labelledby="report-section-{{ section.number }}">
+                        <div class="fj-report-card__head">
+                            <span class="fj-report-card__number" aria-hidden="true">{{ section.number }}</span>
+                            <div>
+                                <h2 class="fj-report-card__title" id="report-section-{{ section.number }}">
+                                    {{ section.title }}
+                                </h2>
+                                <p class="fj-report-card__description">{{ section.description }}</p>
+                            </div>
+                        </div>
+
+                        <div class="fj-report-fields">
+                            {% for field in section.fields %}
+                                {% if field.name == 'reason' %}
+                                    <fieldset class="fj-report-fieldset{% if field.errors %} has-error{% endif %}">
+                                        <legend class="fj-field__legend">
+                                            {{ field.label }}
+                                            <span class="fj-field__required" aria-hidden="true">*</span>
+                                        </legend>
+                                        <div class="fj-choice-grid fj-report-reason-grid">
+                                            {% for choice in field %}
+                                                <label class="fj-choice" for="{{ choice.id_for_label }}">
+                                                    {{ choice.tag }}
+                                                    <span class="fj-choice__text">
+                                                        <span class="fj-choice__title">{{ choice.choice_label }}</span>
+                                                    </span>
+                                                </label>
+                                            {% endfor %}
+                                        </div>
+                                        {% if field.errors %}
+                                            <div id="{{ field.auto_id }}_error">
+                                                {% for error in field.errors %}
+                                                    <p class="fj-field__error" role="alert">{{ error }}</p>
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </fieldset>
+                                {% elif field.name == 'evidence' %}
+                                    <div class="fj-field fj-field--wide{% if field.errors %} has-error{% endif %}">
+                                        <label for="{{ field.auto_id }}">{{ field.label }}</label>
+                                        <div class="fj-report-upload">
+                                            <span class="fj-report-upload__icon" aria-hidden="true">
+                                                {% include "refonte/partials/icon.html" with name="folder" %}
+                                            </span>
+                                            <div class="fj-report-upload__copy">
+                                                <span class="fj-report-upload__title">
+                                                    Joindre une capture d’écran, un reçu ou un message
+                                                </span>
+                                                <span class="fj-report-upload__hint">
+                                                    PNG, JPG, WEBP ou PDF · 5 Mo maximum
+                                                </span>
+                                            </div>
+                                            {{ field }}
+                                        </div>
+                                        {% if field.help_text %}
+                                            <p class="fj-field__help" id="{{ field.auto_id }}_helptext">{{ field.help_text }}</p>
+                                        {% endif %}
+                                        {% if field.errors %}
+                                            <div id="{{ field.auto_id }}_error">
+                                                {% for error in field.errors %}
+                                                    <p class="fj-field__error" role="alert">{{ error }}</p>
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                {% else %}
+                                    <div class="fj-field{% if field.name == 'details' %} fj-field--wide{% endif %}{% if field.errors %} has-error{% endif %}">
+                                        <label for="{{ field.auto_id }}">
+                                            {{ field.label }}
+                                            {% if field.field.required %}<span class="fj-field__required" aria-hidden="true">*</span>{% endif %}
+                                        </label>
+                                        {{ field }}
+                                        {% if field.help_text %}
+                                            <p class="fj-field__help" id="{{ field.auto_id }}_helptext">{{ field.help_text }}</p>
+                                        {% endif %}
+                                        {% if field.errors %}
+                                            <div id="{{ field.auto_id }}_error">
+                                                {% for error in field.errors %}
+                                                    <p class="fj-field__error" role="alert">{{ error }}</p>
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </section>
+                {% endfor %}
+
+                <div class="fj-report-actions">
+                    <button class="fj-btn fj-btn--danger fj-btn--lg" type="submit">
+                        {% include "refonte/partials/icon.html" with name="send" %}
+                        Transmettre le signalement
+                    </button>
+                    <p class="fj-small fj-text-muted">
+                        En envoyant ce formulaire, vous confirmez que les faits décrits
+                        sont exacts à votre connaissance. Un signalement abusif ou
+                        calomnieux peut engager son auteur.
+                    </p>
+                </div>
+            </form>
+        {% endif %}
+    </div>
+
+    <aside class="fj-report-aside" aria-label="Informations sur le traitement du signalement">
+        <section class="fj-panel fj-report-panel" aria-labelledby="next-title">
+            <h2 class="fj-report-panel__title" id="next-title">
+                {% include "refonte/partials/icon.html" with name="shield-check" extra_class="fj-icon--sm" %}
+                Ce qui se passe ensuite
+            </h2>
+            <ol class="fj-report-steps">
+                <li>
+                    <span class="fj-report-steps__number" aria-hidden="true">1</span>
+                    <div>
+                        <strong>Réception et vérification</strong>
+                        <span>Nous examinons les éléments et la source de l’annonce.</span>
+                    </div>
+                </li>
+                <li>
+                    <span class="fj-report-steps__number" aria-hidden="true">2</span>
+                    <div>
+                        <strong>Qualification humaine</strong>
+                        <span>
+                            Si l’annonce est publiée sur Faso Job, elle peut être
+                            suspendue le temps de la vérification.
+                        </span>
+                    </div>
+                </li>
+                <li>
+                    <span class="fj-report-steps__number" aria-hidden="true">3</span>
+                    <div>
+                        <strong>Décision et suivi</strong>
+                        <span>
+                            Nous vous répondons si vous avez laissé des coordonnées.
+                            Aucun statut ne change automatiquement.
+                        </span>
+                    </div>
+                </li>
+            </ol>
+        </section>
+
+        <section class="fj-alert fj-alert--warning fj-report-paid" aria-labelledby="paid-title">
+            {% include "refonte/partials/icon.html" with name="alert-triangle" extra_class="fj-icon--sm" %}
+            <div class="fj-alert__body">
+                <h2 class="fj-alert__title" id="paid-title">Vous avez déjà payé ?</h2>
+                <ol class="fj-report-paid__list">
+                    <li>
+                        <strong>Bloquez le contact.</strong>
+                        Ne répondez plus et conservez la conversation.
+                    </li>
+                    <li>
+                        <strong>Gardez les preuves.</strong>
+                        Capturez les messages, le reçu et les coordonnées utilisées.
+                    </li>
+                    <li>
+                        <strong>Alertez votre opérateur.</strong>
+                        Signalez le transfert Mobile Money ou Wave à votre opérateur.
+                    </li>
+                    <li>
+                        <strong>Déposez plainte.</strong>
+                        Adressez-vous aux autorités compétentes avec vos preuves.
+                    </li>
+                </ol>
+            </div>
+        </section>
+
+        <section class="fj-panel fj-report-panel" aria-labelledby="privacy-title">
+            <h2 class="fj-report-panel__title" id="privacy-title">
+                {% include "refonte/partials/icon.html" with name="lock" extra_class="fj-icon--sm" %}
+                Vos coordonnées restent privées
+            </h2>
+            <p class="fj-small fj-text-muted">
+                Votre nom, votre e-mail et votre téléphone ne sont jamais publiés.
+                Ils servent uniquement au suivi de votre signalement. Vous pouvez
+                rester anonyme en laissant ces champs vides.
+            </p>
+        </section>
+
+        <section class="fj-panel fj-report-panel" aria-labelledby="danger-title">
+            <h2 class="fj-report-panel__title" id="danger-title">
+                {% include "refonte/partials/icon.html" with name="info" extra_class="fj-icon--sm" %}
+                Danger immédiat
+            </h2>
+            <p class="fj-small fj-text-muted">
+                Si vous êtes en danger ou si vous avez subi une agression, contactez
+                d’abord les services d’urgence locaux. Ce formulaire ne remplace pas
+                une plainte.
+            </p>
+        </section>
+    </aside>
+</div>
+{% endblock %}

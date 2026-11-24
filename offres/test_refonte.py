@@ -1,6 +1,6 @@
 import tempfile
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
@@ -9,6 +9,7 @@ import re
 
 from django.test import TestCase, override_settings
 from django.urls import reverse
+from django.utils import timezone
 
 from .models import Offer, OfferReport, OfferSubmission, Source
 
@@ -134,8 +135,13 @@ class CatalogueViewTest(TestCase):
         self.assertContains(response, f'{reverse("catalogue")}?location=Ouagadougou')
 
     def test_catalogue_can_sort_by_closest_deadline(self):
-        later = make_published_offer('Offre plus tardive', deadline='2026-12-31')
-        sooner = make_published_offer('Offre la plus proche', deadline='2026-11-20')
+        today = timezone.localdate()
+        later = make_published_offer(
+            'Offre plus tardive', deadline=today + timedelta(days=45)
+        )
+        sooner = make_published_offer(
+            'Offre la plus proche', deadline=today + timedelta(days=5)
+        )
 
         response = self.client.get(reverse('catalogue'), {'sort': 'deadline'})
 

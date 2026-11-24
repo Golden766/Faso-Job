@@ -1,0 +1,78 @@
+{% comment %}
+Champs communs du filtre catalogue.
+Utilisé dans la colonne latérale (desktop) et dans le dialogue (mobile).
+{% endcomment %}
+<div class="fj-filter-fields">
+    <label class="fj-field">
+        <span class="fj-label">Métier, intitulé ou entreprise</span>
+        <input
+            class="fj-input"
+            type="search"
+            name="q"
+            value="{{ keyword }}"
+            placeholder="Ex. comptable, ONG, développement…"
+            autocomplete="off"
+        >
+    </label>
+
+    <label class="fj-field">
+        <span class="fj-label">Localité</span>
+        <select class="fj-select" name="location">
+            <option value="">Toutes les localités</option>
+            {% for city in locations %}
+                <option value="{{ city }}"{% if city == location %} selected{% endif %}>{{ city }}</option>
+            {% endfor %}
+        </select>
+    </label>
+
+    <label class="fj-field">
+        <span class="fj-label">Type d’opportunité</span>
+        <select class="fj-select" name="type">
+            <option value="">Tous les types</option>
+            {% for opportunity in opportunity_types %}
+                <option value="{{ opportunity }}"{% if opportunity == opportunity_type %} selected{% endif %}>{{ opportunity }}</option>
+            {% endfor %}
+        </select>
+    </label>
+
+    <div class="fj-filter-grid">
+        <label class="fj-field">
+            <span class="fj-label">Rémunération minimale</span>
+            <input class="fj-input" type="number" name="salary_min" min="0" step="0.01" value="{{ salary_min }}" placeholder="Facultatif">
+        </label>
+        <label class="fj-field">
+            <span class="fj-label">Rémunération maximale</span>
+            <input class="fj-input" type="number" name="salary_max" min="0" step="0.01" value="{{ salary_max }}" placeholder="Facultatif">
+        </label>
+    </div>
+
+    <div class="fj-filter-grid">
+        <label class="fj-field">
+            <span class="fj-label">Clôture à partir du</span>
+            <input class="fj-input" type="date" name="deadline_from" value="{{ deadline_from }}">
+        </label>
+        <label class="fj-field">
+            <span class="fj-label">Clôture jusqu’au</span>
+            <input class="fj-input" type="date" name="deadline_to" value="{{ deadline_to }}">
+        </label>
+    </div>
+
+    <fieldset class="fj-fieldset fj-fieldset--compact">
+        <legend class="fj-label">Vérifications</legend>
+        <label class="fj-check">
+            <input type="checkbox" name="source_verified" value="1"{% if request.GET.source_verified == '1' %} checked{% endif %}>
+            <span>Source vérifiée</span>
+        </label>
+        <label class="fj-check">
+            <input type="checkbox" name="availability_confirmed" value="1"{% if request.GET.availability_confirmed == '1' %} checked{% endif %}>
+            <span>Disponibilité confirmée</span>
+        </label>
+    </fieldset>
+
+    {% if salary_error %}
+        <p class="fj-field__error" role="alert">{{ salary_error }}</p>
+    {% endif %}
+    {% if deadline_error %}
+        <p class="fj-field__error" role="alert">{{ deadline_error }}</p>
+    {% endif %}
+</div>

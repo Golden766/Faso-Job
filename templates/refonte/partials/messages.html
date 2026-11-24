@@ -1,0 +1,10 @@
+{% if messages %}
+<div class="fj-container fj-messages">
+    {% for message in messages %}
+        <div class="fj-alert fj-alert--{% if message.tags == 'error' %}danger{% elif message.tags %}{{ message.tags }}{% else %}info{% endif %}" role="status">
+            {% include "refonte/partials/icon.html" with name="info" extra_class="fj-icon--sm" %}
+            <span>{{ message }}</span>
+        </div>
+    {% endfor %}
+</div>
+{% endif %}

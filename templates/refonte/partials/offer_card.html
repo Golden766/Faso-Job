@@ -1,0 +1,108 @@
+{% comment %}
+Carte d'offre réutilisable.
+Attend un objet `offer` avec, si possible, `deadline_urgency`,
+`days_until_deadline` et `days_since_deadline` calculés par la vue.
+{% endcomment %}
+<article class="fj-offer-card{% if offer.deadline_urgency and offer.deadline_urgency != 'normal' %} is-{{ offer.deadline_urgency }}{% endif %}">
+    <a class="fj-offer-card__overlay" href="{% url 'offer_detail' offer.slug %}" aria-label="Consulter l’offre : {{ offer.title }}"></a>
+
+    <div class="fj-offer-card__header">
+        <div class="fj-offer-card__badges">
+            {% if offer.deadline_urgency == 'expired' %}
+                <span class="fj-badge fj-badge--danger">
+                    {% include "refonte/partials/icon.html" with name="x-circle" %} Offre fermée
+                </span>
+            {% elif offer.is_employer_verified %}
+                <span class="fj-badge fj-badge--success">
+                    {% include "refonte/partials/icon.html" with name="shield-check" %} Employeur vérifié
+                </span>
+            {% endif %}
+            {% if offer.is_source_confirmed %}
+                <span class="fj-badge fj-badge--info">
+                    {% include "refonte/partials/icon.html" with name="external-link" %} Source retrouvée
+                </span>
+            {% endif %}
+            {% if offer.application_action_is_whatsapp and offer.deadline_urgency != 'expired' %}
+                <span class="fj-badge fj-badge--whatsapp">
+                    {% include "refonte/partials/icon.html" with name="whatsapp" extra_class="fj-icon--solid" %} WhatsApp
+                </span>
+            {% endif %}
+        </div>
+        <span class="fj-offer-card__posted">Publié il y a {{ offer.created_at|timesince }}</span>
+    </div>
+
+    <div>
+        <h3 class="fj-offer-card__title">{{ offer.title }}</h3>
+        <p class="fj-offer-card__company">{{ offer.company_name|default:"Employeur non précisé" }}</p>
+    </div>
+
+    {% if offer.location or offer.employment_type or offer.salary_min or offer.salary_max or offer.salary_note %}
+        <div class="fj-offer-card__meta">
+            {% if offer.location %}
+                <span class="fj-chip">
+                    {% include "refonte/partials/icon.html" with name="map-pin" %} {{ offer.location }}
+                </span>
+            {% endif %}
+            {% if offer.employment_type %}
+                <span class="fj-chip">
+                    {% include "refonte/partials/icon.html" with name="briefcase" %} {{ offer.employment_type }}
+                </span>
+            {% endif %}
+            {% if offer.salary_min or offer.salary_max %}
+                <span class="fj-chip">
+                    {% include "refonte/partials/icon.html" with name="credit-card" %}
+                    {% if offer.salary_min and offer.salary_max %}
+                        {{ offer.salary_min|floatformat:0 }} – {{ offer.salary_max|floatformat:0 }}
+                    {% elif offer.salary_min %}
+                        À partir de {{ offer.salary_min|floatformat:0 }}
+                    {% else %}
+                        Jusqu’à {{ offer.salary_max|floatformat:0 }}
+                    {% endif %}
+                    {{ offer.salary_currency }}
+                </span>
+            {% elif offer.salary_note %}
+                <span class="fj-chip">
+                    {% include "refonte/partials/icon.html" with name="credit-card" %} {{ offer.salary_note }}
+                </span>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    {% if offer.deadline %}
+        <p class="fj-offer-card__deadline {% if offer.deadline_urgency == 'expired' or offer.deadline_urgency == 'last-day' or offer.deadline_urgency == 'urgent' %}fj-text-danger{% elif offer.deadline_urgency == 'soon' %}fj-text-primary{% else %}fj-text-secondary{% endif %}">
+            {% include "refonte/partials/icon.html" with name="clock" extra_class="fj-icon--sm" %}
+            Clôture le {{ offer.deadline|date:"d/m/Y" }}{% if offer.deadline_time %} à {{ offer.deadline_time|time:"H:i" }}{% endif %}
+            <span aria-hidden="true">·</span>
+            {% if offer.deadline_urgency == 'expired' %}
+                Clôturée depuis {{ offer.days_since_deadline }} jour{{ offer.days_since_deadline|pluralize }}
+            {% elif offer.deadline_urgency == 'last-day' %}
+                Dernier jour pour postuler
+            {% elif offer.days_until_deadline %}
+                Reste {{ offer.days_until_deadline }} jour{{ offer.days_until_deadline|pluralize }} pour postuler
+            {% else %}
+                Candidatures ouvertes
+            {% endif %}
+        </p>
+    {% endif %}
+
+    <div class="fj-offer-card__footer">
+        <span class="fj-small">{{ offer.application_channel_label }}</span>
+        <div class="fj-cluster">
+            <button
+                class="fj-btn fj-btn--secondary fj-btn--sm fj-favorite-button"
+                type="button"
+                data-favorite-toggle
+                data-favorite-id="{{ offer.pk }}"
+                data-favorite-title="{{ offer.title }}"
+                data-favorite-company="{{ offer.company_name|default:'Employeur non précisé' }}"
+                data-favorite-url="{% url 'offer_detail' offer.slug %}"
+                aria-pressed="false"
+                hidden
+            >
+                {% include "refonte/partials/icon.html" with name="heart" extra_class="fj-icon--sm" %}
+                <span data-favorite-label>Ajouter aux favoris</span>
+            </button>
+            <a class="fj-btn fj-btn--secondary fj-btn--sm" href="{% url 'offer_detail' offer.slug %}">Voir l’offre</a>
+        </div>
+    </div>
+</article>

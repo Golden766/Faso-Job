@@ -1,0 +1,237 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block title %}{{ title }} | Faso Job — Administration{% endblock %}
+
+{% block bodyclass %}{{ block.super }} editorial-dashboard{% endblock %}
+
+{% block content_title %}{% endblock %}
+{% block content_subtitle %}{% endblock %}
+
+{% block content %}
+{% firstof user.get_short_name user.get_username as display_name %}
+<div class="dashboard-main">
+        <div class="dashboard-page-heading">
+            <div>
+                <p class="dashboard-eyebrow">Espace de gestion</p>
+                <h1>Bonjour, {{ display_name }}.</h1>
+                <p>
+                    Voici les opérations et éléments qui demandent votre attention.
+                    <span class="dashboard-date">{{ today|date:"l j F Y" }}</span>
+                </p>
+            </div>
+            <div class="dashboard-heading-actions">
+                <a class="dashboard-secondary-action" href="{{ activity_report_url }}">
+                    Rapport d’activité
+                </a>
+                <a class="dashboard-secondary-action" href="{{ activity_csv_url }}">
+                    Export CSV
+                </a>
+                {% if can_add_offer %}
+                    <a class="dashboard-primary-action" href="{% url 'admin:offres_offer_add' %}">
+                        <span aria-hidden="true">＋</span> Ajouter une offre
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if open_reports_count %}
+            <a class="dashboard-alert" href="{{ report_list_url }}?status__exact=open">
+                <span class="dashboard-alert__icon" aria-hidden="true">!</span>
+                <span class="dashboard-alert__body">
+                    <strong>{{ open_reports_count }} signalement{{ open_reports_count|pluralize }} à traiter</strong>
+                    <span>Des annonces ou contacts ont été signalés et attendent une vérification humaine.</span>
+                </span>
+                <span class="dashboard-alert__link">Ouvrir les signalements →</span>
+            </a>
+        {% else %}
+            <div class="dashboard-alert dashboard-alert--calm">
+                <span class="dashboard-alert__icon" aria-hidden="true">✓</span>
+                <span class="dashboard-alert__body">
+                    <strong>Aucun signalement ouvert</strong>
+                    <span>Les signalements reçus ont tous été traités ou ne sont pas encore publiés.</span>
+                </span>
+            </div>
+        {% endif %}
+
+        <section class="dashboard-metrics" aria-label="Indicateurs">
+            <a class="metric-card" href="{{ offer_list_url }}?status__exact=published">
+                <span>Offres actives</span>
+                <strong>{{ active_offers_count }}</strong>
+                <small>{{ published_offers_count }} offre{{ published_offers_count|pluralize }} publiée{{ published_offers_count|pluralize }} au total</small>
+            </a>
+            <a class="metric-card metric-card--danger" href="{{ expired_offers_url }}">
+                <span>Offres expirées</span>
+                <strong>{{ expired_offers_count }}</strong>
+                <small>À modifier ou archiver</small>
+            </a>
+            <a class="metric-card" href="{{ offer_list_url }}?status__exact=pending_review">
+                <span>À contrôler</span>
+                <strong>{{ pending_offers_count }}</strong>
+                <small>{{ pending_submissions_count }} proposition{{ pending_submissions_count|pluralize }} en attente</small>
+            </a>
+            <a class="metric-card" href="{{ offer_list_url }}">
+                <span>Disponibilité à confirmer</span>
+                <strong>{{ offers_to_refresh_count }}</strong>
+                <small>Offres actives sans date de confirmation</small>
+            </a>
+            <a class="metric-card metric-card--danger" href="{{ report_list_url }}?status__exact=open">
+                <span>Signalements ouverts</span>
+                <strong>{{ open_reports_count }}</strong>
+                <small>Vérification humaine requise</small>
+            </a>
+            {% if perms.offres.view_blacklistedcontact %}
+                <a class="metric-card" href="{{ blacklist_list_url }}">
+                    <span>Liste noire</span>
+                    <strong>{{ blacklist_total_count }}</strong>
+                    <small>{{ blacklist_blocked_count }} bloqué{{ blacklist_blocked_count|pluralize }} · {{ blacklist_watch_count }} sous surveillance</small>
+                </a>
+            {% endif %}
+            {% if quarantined_offers_count or quarantined_submissions_count %}
+                <a class="metric-card metric-card--danger" href="{{ offer_list_url }}?quarantine_reason__gt=">
+                    <span>En quarantaine</span>
+                    <strong>{{ quarantined_offers_count }}</strong>
+                    <small>{{ quarantined_submissions_count }} proposition{{ quarantined_submissions_count|pluralize }} concernee{{ quarantined_submissions_count|pluralize }}</small>
+                </a>
+            {% endif %}
+        </section>
+
+        <section class="dashboard-section" aria-labelledby="tasks-title">
+            <div class="dashboard-section-heading">
+                <h2 id="tasks-title">Actions à traiter</h2>
+                <span>Les nouvelles annonces attendent toujours une vérification.</span>
+            </div>
+            <div class="dashboard-task-grid">
+                <a class="dashboard-task-card" href="{{ offer_list_url }}?status__exact=pending_review">
+                    <strong>{{ pending_offers_count }} annonce{{ pending_offers_count|pluralize }} à contrôler</strong>
+                    <span>Vérifier les informations, la source et les modalités avant publication.</span>
+                    <span class="dashboard-task-link">Ouvrir la file de contrôle →</span>
+                </a>
+                <a class="dashboard-task-card" href="{{ submission_list_url }}?status__exact=pending">
+                    <strong>{{ pending_submissions_count }} proposition{{ pending_submissions_count|pluralize }} reçue{{ pending_submissions_count|pluralize }}</strong>
+                    <span>Examiner les annonces envoyées par les entreprises ou contributeurs.</span>
+                    <span class="dashboard-task-link">Examiner les propositions →</span>
+                </a>
+                <a class="dashboard-task-card" href="{{ offer_list_url }}">
+                    <strong>{{ offers_to_refresh_count }} offre{{ offers_to_refresh_count|pluralize }} à confirmer</strong>
+                    <span>Confirmer séparément si les annonces sont toujours disponibles.</span>
+                    <span class="dashboard-task-link">Voir les offres →</span>
+                </a>
+                {% if perms.offres.view_blacklistedcontact %}
+                <a class="dashboard-task-card" href="{{ blacklist_list_url }}">
+                    <strong>{{ blacklist_total_count }} contact{{ blacklist_total_count|pluralize }} sur liste noire</strong>
+                    <span>Registre privé des coordonnées frauduleuses, réservé à l’administration.</span>
+                    <span class="dashboard-task-link">Ouvrir le registre →</span>
+                </a>
+                {% endif %}
+                {% if perms.offres.view_collectedannouncement %}
+                <a class="dashboard-task-card" href="{% url 'admin-veille' %}">
+                    <strong>{{ veille_pending_count }} annonce{{ veille_pending_count|pluralize }} collectée{{ veille_pending_count|pluralize }} à vérifier</strong>
+                    <span>Les offres trouvées sur les sources surveillées attendent votre validation. Rien n’est publié automatiquement.</span>
+                    <span class="dashboard-task-link">Ouvrir le Centre de veille →</span>
+                </a>
+                {% endif %}
+            </div>
+        </section>
+
+        <div class="dashboard-columns">
+            <section class="dashboard-section" aria-labelledby="recent-title">
+                <div class="dashboard-section-heading">
+                    <h2 id="recent-title">Dernières offres modifiées</h2>
+                    <a href="{{ offer_list_url }}">Toutes les offres →</a>
+                </div>
+                <div class="recent-offers-wrap">
+                    <table class="recent-offers">
+                        <thead>
+                            <tr>
+                                <th>Intitulé</th>
+                                <th>Entreprise</th>
+                                <th>Statut</th>
+                                <th>Publiée le</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for offer in recent_offers %}
+                            <tr>
+                                <td>{{ offer.title }}</td>
+                                <td>{{ offer.company_name|default:"Non précisée" }}</td>
+                                <td>{{ offer.get_status_display }}</td>
+                                <td>{% if offer.published_at %}{{ offer.published_at|date:"d/m/Y" }}{% else %}—{% endif %}</td>
+                                <td><a href="{% url 'admin:offres_offer_change' offer.pk %}">Ouvrir</a></td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="5">Aucune offre enregistrée pour le moment.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="dashboard-section" aria-labelledby="reports-title">
+                <div class="dashboard-section-heading">
+                    <h2 id="reports-title">Signalements à traiter</h2>
+                    <a href="{{ report_list_url }}?status__exact=open">Tous les signalements →</a>
+                </div>
+                <ul class="dashboard-feed">
+                    {% for report in recent_reports %}
+                        <li class="dashboard-feed__item">
+                            <span class="dashboard-feed__dot dashboard-feed__dot--danger" aria-hidden="true"></span>
+                            <div>
+                                <a href="{% url 'admin:offres_offerreport_change' report.pk %}">
+                                    {{ report.get_reason_display }}
+                                </a>
+                                <p>
+                                    {{ report.suspect_organization|default:report.suspect_title|default:"Annonce non précisée" }}
+                                    <span class="dashboard-feed__meta">
+                                        {{ report.created_at|date:"d/m/Y" }} · {{ report.get_status_display }}
+                                    </span>
+                                </p>
+                            </div>
+                        </li>
+                    {% empty %}
+                        <li class="dashboard-feed__empty">Aucun signalement ouvert.</li>
+                    {% endfor %}
+                </ul>
+            </section>
+        </div>
+
+        <section class="dashboard-section" aria-labelledby="submissions-title">
+            <div class="dashboard-section-heading">
+                <h2 id="submissions-title">Dernières propositions reçues</h2>
+                <a href="{{ submission_list_url }}?status__exact=pending">Toutes les propositions →</a>
+            </div>
+            <div class="recent-offers-wrap">
+                <table class="recent-offers">
+                    <thead>
+                        <tr>
+                            <th>Intitulé</th>
+                            <th>Entreprise</th>
+                            <th>Déclarant</th>
+                            <th>Reçue le</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for submission in recent_submissions %}
+                        <tr>
+                            <td>{{ submission.title }}</td>
+                            <td>{{ submission.company_name }}</td>
+                            <td>{{ submission.get_declarant_role_display }}</td>
+                            <td>{{ submission.created_at|date:"d/m/Y" }}</td>
+                            <td><a href="{% url 'admin:offres_offersubmission_change' submission.pk %}">Examiner</a></td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="5">Aucune proposition en attente.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <aside class="dashboard-help">
+            <span class="dashboard-help-icon" aria-hidden="true">i</span>
+            <p><strong>Rappel :</strong> la publication, la vérification de la source et la disponibilité sont des états distincts. Une soumission acceptée reste à contrôler avant publication.</p>
+        </aside>
+    </div>
+{% endblock %}

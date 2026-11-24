@@ -1,0 +1,59 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block title %}{{ title }} | Faso Job — Administration{% endblock %}
+{% block bodyclass %}{{ block.super }} editorial-dashboard{% endblock %}
+{% block content_title %}{% endblock %}
+
+{% block content %}
+<div class="dashboard-main">
+    <div class="dashboard-page-heading">
+        <div>
+            <p class="dashboard-eyebrow">Gestion des annonces</p>
+            <h1>Offres expirées</h1>
+            <p>Les offres dont la date limite de candidature est dépassée.</p>
+        </div>
+        <div class="dashboard-heading-actions">
+            <a class="dashboard-secondary-action" href="{{ offer_list_url }}">Toutes les offres</a>
+        </div>
+    </div>
+
+    <section class="dashboard-section" aria-label="Liste des offres expirées">
+        <div class="recent-offers-wrap">
+            <table class="recent-offers">
+                <thead>
+                    <tr>
+                        <th>Intitulé</th>
+                        <th>Entreprise</th>
+                        <th>Lieu</th>
+                        <th>Date limite</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for offer in expired_offers %}
+                    <tr>
+                        <td>{{ offer.title }}</td>
+                        <td>{{ offer.company_name|default:"Non précisée" }}</td>
+                        <td>{{ offer.location|default:"—" }}</td>
+                        <td>{{ offer.deadline|date:"d/m/Y" }}{% if offer.deadline_time %} à {{ offer.deadline_time|time:"H:i" }}{% endif %}</td>
+                        <td class="expired-offer-actions">
+                            {% if can_change_offer %}
+                                <a class="dashboard-secondary-action" href="{% url 'admin:offres_offer_change' offer.pk %}">Modifier</a>
+                                <form method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="offer_id" value="{{ offer.pk }}">
+                                    <button class="expired-offer-archive" type="submit">Archiver</button>
+                                </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="5">Aucune offre expirée à traiter.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<main class="container section form-page">
+    <header class="form-intro">
+        <p class="eyebrow">Employeur ou contributeur</p>
+        <h1>{{ title }}</h1>
+        <p>Partagez gratuitement une annonce. Les informations envoyées seront examinées par notre équipe avant toute publication.</p>
+    </header>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="form-success" role="status">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <form class="public-form" method="post">
+        {% csrf_token %}
+        {% if form.non_field_errors %}<div class="form-errors" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+        {% for section_title, fields in form.sections %}
+            <fieldset class="form-section">
+                <legend>{{ section_title }}</legend>
+                <div class="form-section-fields">
+                    {% for field in fields %}
+                        <div class="form-field{% if field.name == 'details' or field.name == 'application_instructions' or field.name == 'required_documents' %} form-field-wide{% endif %}">
+                            <label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %}<span aria-hidden="true"> *</span>{% endif %}</label>
+                            {{ field }}
+                            {% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}
+                            {% for error in field.errors %}<p class="field-error" role="alert">{{ error }}</p>{% endfor %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </fieldset>
+        {% endfor %}
+        <p class="form-privacy">Votre proposition reste en attente de contrôle. Elle ne sera jamais publiée automatiquement.</p>
+        <button class="btn btn-primary" type="submit">Envoyer la proposition</button>
+    </form>
+</main>
+{% endblock %}

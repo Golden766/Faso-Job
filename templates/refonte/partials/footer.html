@@ -1,0 +1,44 @@
+<footer class="fj-footer">
+    <div class="fj-container">
+        <div class="fj-footer__grid">
+            <div>
+                <a class="fj-brand" href="{% url 'home' %}">
+                    <span class="fj-brand__mark" aria-hidden="true">FJ</span>
+                    <span class="fj-brand__text">
+                        <span class="fj-brand__name">Faso Job</span>
+                        <span class="fj-brand__tagline">Opportunités professionnelles au Burkina Faso</span>
+                    </span>
+                </a>
+                <p class="fj-small fj-footer__description">
+                    Faso Job rassemble les offres d’emploi, les stages et les opportunités
+                    professionnelles au Burkina Faso, avec leur source et leurs modalités
+                    de candidature.
+                </p>
+                <p class="fj-footer__trust">
+                    {% include "refonte/partials/icon.html" with name="shield-check" extra_class="fj-icon--sm" %}
+                    Traçabilité et vérification des annonces
+                </p>
+            </div>
+
+            <nav aria-label="Navigation et services">
+                <h2 class="fj-footer__title">Navigation &amp; services</h2>
+                <a class="fj-footer__link" href="{% url 'home' %}">Accueil</a>
+                <a class="fj-footer__link" href="{% url 'catalogue' %}">Toutes les offres</a>
+                <a class="fj-footer__link" href="{% url 'favorites' %}">Mes favoris</a>
+                <a class="fj-footer__link" href="{% url 'submit_offer' %}">Proposer une annonce</a>
+                <a class="fj-footer__link" href="{% url 'method' %}">Comment ça marche ?</a>
+            </nav>
+
+            <nav aria-label="Confiance et informations légales">
+                <h2 class="fj-footer__title">Confiance &amp; légal</h2>
+                <a class="fj-footer__link" href="{% url 'method' %}#controle-des-annonces">Méthode de contrôle</a>
+                <a class="fj-footer__link" href="{% url 'report_fraud' %}">Signaler une arnaque</a>
+            </nav>
+        </div>
+
+        <div class="fj-footer__bottom">
+            <p>&copy; {% now "Y" %} Faso Job. Tous droits réservés.</p>
+            <p>Plateforme consacrée à l’emploi local et régional.</p>
+        </div>
+    </div>
+</footer>

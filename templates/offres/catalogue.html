@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<section class="container section catalogue-page">
+    <header class="catalogue-heading">
+        <p class="eyebrow">Catalogue des offres</p>
+        <h1>{{ title }}</h1>
+        <p class="catalogue-lead">Trouvez une offre claire, vérifiée et adaptée à votre profil.</p>
+    </header>
+
+    <div class="catalogue-layout">
+        <div class="catalogue-results">
+            <div class="results-heading">
+                <h2>Résultats</h2>
+                <p>{{ result_count }} offre{{ result_count|pluralize:"s" }} disponible{{ result_count|pluralize:"s" }}</p>
+            </div>
+
+            {% if offers %}
+                <div class="offer-list">
+                    {% for offer in offers %}
+                    <article class="offer-list-card{% if offer.deadline_urgency %} offer-card-deadline-{{ offer.deadline_urgency }}{% endif %}">
+                        <a class="offer-card-overlay" href="{% url 'offer_detail' offer.slug %}" aria-label="Consulter l’offre : {{ offer.title }}"></a>
+                        <div class="offer-list-main">
+                            <div class="offer-meta-top">
+                                {% if offer.is_source_confirmed %}<span class="badge badge-green">Source vérifiée</span>{% endif %}
+                                {% if offer.is_employer_verified %}<span class="badge badge-green">Employeur vérifié</span>{% endif %}
+                                {% if offer.is_available %}<span class="badge badge-warning">Candidature ouverte</span>{% endif %}
+                            </div>
+                            <h3><a href="{% url 'offer_detail' offer.slug %}">{{ offer.title }}</a></h3>
+                            <p class="offer-company">{{ offer.company_name|default:"Employeur non précisé" }}</p>
+                            {% if offer.location or offer.employment_type or offer.salary_min or offer.salary_max or offer.salary_note %}
+                                <p class="offer-list-meta">
+                                    {% if offer.location %}<span>{{ offer.location }}</span>{% endif %}
+                                    {% if offer.employment_type %}<span>{{ offer.employment_type }}</span>{% endif %}
+                                    {% if offer.salary_min or offer.salary_max %}
+                                        <span>
+                                            Rémunération :
+                                            {% if offer.salary_min and offer.salary_max %}
+                                                {{ offer.salary_min|floatformat:0 }} – {{ offer.salary_max|floatformat:0 }}
+                                            {% elif offer.salary_min %}
+                                                à partir de {{ offer.salary_min|floatformat:0 }}
+                                            {% else %}
+                                                jusqu’à {{ offer.salary_max|floatformat:0 }}
+                                            {% endif %}
+                                            {{ offer.salary_currency }}
+                                        </span>
+                                    {% elif offer.salary_note %}
+                                        <span>{{ offer.salary_note }}</span>
+                                    {% endif %}
+                                </p>
+                            {% endif %}
+                            {% if offer.application_method or offer.application_url or offer.application_email or offer.application_phone or offer.application_instructions %}
+                                <p class="offer-candidature-mode">{{ offer.application_channel_label }}</p>
+                            {% endif %}
+                            {% if offer.deadline %}
+                                <p class="offer-deadline-row deadline-{{ offer.deadline_urgency }}">
+                                    <span>
+                                        Clôture le {{ offer.deadline|date:"d/m/Y" }}{% if offer.deadline_time %} à {{ offer.deadline_time|time:"H:i" }}{% endif %}
+                                    </span>
+                                    <span class="deadline-countdown">
+                                        {% if offer.days_until_deadline > 0 %}
+                                            {{ offer.days_until_deadline }} jour{{ offer.days_until_deadline|pluralize }} restant{{ offer.days_until_deadline|pluralize }}
+                                        {% elif offer.days_until_deadline == 0 %}
+                                            Dernier jour pour postuler
+                                        {% else %}
+                                            Clôturée depuis {{ offer.days_since_deadline }} jour{{ offer.days_since_deadline|pluralize }}
+                                        {% endif %}
+                                    </span>
+                                </p>
+                            {% endif %}
+                            <p class="offer-description">{{ offer.description|truncatewords:28 }}</p>
+                        </div>
+                        <a class="card-link" href="{% url 'offer_detail' offer.slug %}">Consulter l’offre <span aria-hidden="true">→</span></a>
+                    </article>
+                    {% endfor %}
+                </div>
+
+                {% if page_obj.has_other_pages %}
+                <nav class="pagination" aria-label="Pagination des offres">
+                    {% if page_obj.has_previous %}
+                        <a href="?{% if querystring %}{{ querystring|safe }}&{% endif %}page={{ page_obj.previous_page_number }}">← Précédent</a>
+                    {% else %}
+                        <span class="pagination-disabled">← Précédent</span>
+                    {% endif %}
+                    <span>Page {{ page_obj.number }} sur {{ paginator.num_pages }}</span>
+                    {% if page_obj.has_next %}
+                        <a href="?{% if querystring %}{{ querystring|safe }}&{% endif %}page={{ page_obj.next_page_number }}">Suivant →</a>
+                    {% else %}
+                        <span class="pagination-disabled">Suivant →</span>
+                    {% endif %}
+                </nav>
+                {% endif %}
+            {% else %}
+                <div class="empty-state">
+                    <h3>Aucune offre ne correspond à ces critères</h3>
+                    <p>Essayez d’élargir la recherche ou de retirer certains filtres.</p>
+                    <a class="section-link" href="{% url 'catalogue' %}">Afficher toutes les offres <span aria-hidden="true">→</span></a>
+                </div>
+            {% endif %}
+        </div>
+
+        <aside class="catalogue-sidebar">
+            <button class="mobile-filter-toggle" type="button" aria-controls="catalogue-filters">Rechercher et filtrer</button>
+            <dialog class="filters-panel" id="catalogue-filters" aria-labelledby="catalogue-filters-title">
+                <div class="filter-panel-heading">
+                    <h2 id="catalogue-filters-title">Rechercher et filtrer les offres</h2>
+                    <button class="filters-close" type="button" aria-label="Fermer les filtres">×</button>
+                </div>
+                <form method="get" action="{% url 'catalogue' %}">
+                    <div class="filter-row">
+                        <label>
+                            <span>Métier, mots-clés ou entreprise</span>
+                            <input type="search" name="q" value="{{ keyword }}" placeholder="Ex. comptable, secteur…">
+                        </label>
+                        <label>
+                            <span>Ville</span>
+                            <input type="search" name="location" value="{{ location }}" placeholder="Ex. Ouagadougou">
+                        </label>
+                        <label>
+                            <span>Type d’opportunité</span>
+                            <select name="type">
+                                <option value="">Tous les types</option>
+                                {% for type in opportunity_types %}
+                                    <option value="{{ type }}" {% if type == opportunity_type %}selected{% endif %}>{{ type }}</option>
+                                {% endfor %}
+                            </select>
+                        </label>
+                        <label>
+                            <span>Rémunération minimale</span>
+                            <input type="number" name="salary_min" min="0" step="0.01" value="{{ salary_min }}" placeholder="Facultatif">
+                        </label>
+                        <label>
+                            <span>Rémunération maximale</span>
+                            <input type="number" name="salary_max" min="0" step="0.01" value="{{ salary_max }}" placeholder="Facultatif">
+                        </label>
+                        <label>
+                            <span>Date de clôture à partir du</span>
+                            <input type="date" name="deadline_from" value="{{ deadline_from }}">
+                        </label>
+                        <label>
+                            <span>Date de clôture jusqu’au</span>
+                            <input type="date" name="deadline_to" value="{{ deadline_to }}">
+                        </label>
+                    </div>
+                    <div class="filter-options">
+                        <label class="checkbox-field">
+                            <input type="checkbox" name="source_verified" value="1" {% if request.GET.source_verified == '1' %}checked{% endif %}>
+                            <span>Source vérifiée</span>
+                        </label>
+                        <label class="checkbox-field">
+                            <input type="checkbox" name="availability_confirmed" value="1" {% if request.GET.availability_confirmed == '1' %}checked{% endif %}>
+                            <span>Disponibilité confirmée</span>
+                        </label>
+                        <label class="sort-field">
+                            <span>Trier par</span>
+                            <select name="sort">
+                                <option value="recent" {% if sort == 'recent' %}selected{% endif %}>Plus récentes</option>
+                                <option value="salary" {% if sort == 'salary' %}selected{% endif %}>Rémunération</option>
+                            </select>
+                        </label>
+                        <div class="filter-actions">
+                            <button type="submit" class="btn btn-primary">Appliquer</button>
+                            <a class="clear-filters" href="{% url 'catalogue' %}">Effacer</a>
+                        </div>
+                    </div>
+                    {% if salary_error %}<p class="field-error" role="alert">{{ salary_error }}</p>{% endif %}
+                    {% if deadline_error %}<p class="field-error" role="alert">{{ deadline_error }}</p>{% endif %}
+                </form>
+            </dialog>
+        </aside>
+    </div>
+</section>
+{% endblock %}

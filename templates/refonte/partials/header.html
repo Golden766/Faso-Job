@@ -1,0 +1,43 @@
+{% load static %}
+<header class="fj-header">
+    <div class="fj-container fj-header__inner">
+        <a class="fj-brand" href="{% url 'home' %}">
+            <span class="fj-brand__mark" aria-hidden="true">FJ</span>
+            <span class="fj-brand__text">
+                <span class="fj-brand__name">Faso Job</span>
+                <span class="fj-brand__tagline">Opportunités professionnelles au Burkina Faso</span>
+            </span>
+        </a>
+
+        <nav class="fj-nav" aria-label="Navigation principale">
+            <a class="fj-nav__link{% if active_nav == 'home' %} is-active{% endif %}" href="{% url 'home' %}">Accueil</a>
+            <a class="fj-nav__link{% if active_nav == 'catalogue' %} is-active{% endif %}" href="{% url 'catalogue' %}">Offres</a>
+            <a class="fj-nav__link{% if active_nav == 'favorites' %} is-active{% endif %}" href="{% url 'favorites' %}" data-favorites-link>
+                Mes favoris <span class="fj-favorites-count" data-favorites-count aria-live="polite" hidden>0</span>
+            </a>
+            <a class="fj-nav__link{% if active_nav == 'method' %} is-active{% endif %}" href="{% url 'method' %}">Comment ça marche ?</a>
+            <a class="fj-nav__link" href="{% url 'method' %}#controle-des-annonces">Contrôle des annonces</a>
+        </nav>
+
+        <div class="fj-header__actions">
+            <a class="fj-btn fj-btn--primary fj-header__cta" href="{% url 'submit_offer' %}">Proposer une annonce</a>
+            <details class="fj-menu">
+                <summary aria-label="Ouvrir le menu de navigation">
+                    {% include "refonte/partials/icon.html" with name="menu" %}
+                </summary>
+                <nav class="fj-menu__panel" aria-label="Navigation mobile">
+                    <a class="fj-menu__link{% if active_nav == 'home' %} is-active{% endif %}" href="{% url 'home' %}">Accueil</a>
+                    <a class="fj-menu__link{% if active_nav == 'catalogue' %} is-active{% endif %}" href="{% url 'catalogue' %}">Offres</a>
+                    <a class="fj-menu__link{% if active_nav == 'favorites' %} is-active{% endif %}" href="{% url 'favorites' %}" data-favorites-link>
+                        Mes favoris <span class="fj-favorites-count" data-favorites-count aria-live="polite" hidden>0</span>
+                    </a>
+                    <a class="fj-menu__link" href="{% url 'method' %}">Comment ça marche ?</a>
+                    <a class="fj-menu__link" href="{% url 'method' %}#controle-des-annonces">Contrôle des annonces</a>
+                    <a class="fj-menu__link" href="{% url 'report_fraud' %}">Signaler une arnaque</a>
+                    <div class="fj-menu__divider" aria-hidden="true"></div>
+                    <a class="fj-menu__link" href="{% url 'submit_offer' %}">Proposer une annonce</a>
+                </nav>
+            </details>
+        </div>
+    </div>
+</header>

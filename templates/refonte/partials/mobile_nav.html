@@ -1,0 +1,22 @@
+<nav class="fj-bottom-nav" aria-label="Navigation mobile principale">
+    <a class="fj-bottom-nav__link{% if active_nav == 'home' %} is-active{% endif %}" href="{% url 'home' %}">
+        {% include "refonte/partials/icon.html" with name="home" %}
+        <span>Accueil</span>
+    </a>
+    <a class="fj-bottom-nav__link{% if active_nav == 'catalogue' %} is-active{% endif %}" href="{% url 'catalogue' %}">
+        {% include "refonte/partials/icon.html" with name="briefcase" %}
+        <span>Offres</span>
+    </a>
+    <a class="fj-bottom-nav__link{% if active_nav == 'favorites' %} is-active{% endif %}" href="{% url 'favorites' %}" data-favorites-link>
+        {% include "refonte/partials/icon.html" with name="heart" %}
+        <span>Favoris <span data-favorites-count aria-live="polite" hidden>0</span></span>
+    </a>
+    <a class="fj-bottom-nav__link{% if active_nav == 'submit' %} is-active{% endif %}" href="{% url 'submit_offer' %}">
+        {% include "refonte/partials/icon.html" with name="plus" %}
+        <span>Proposer</span>
+    </a>
+    <a class="fj-bottom-nav__link{% if active_nav == 'method' %} is-active{% endif %}" href="{% url 'method' %}#controle-des-annonces">
+        {% include "refonte/partials/icon.html" with name="shield-check" %}
+        <span>Contrôle</span>
+    </a>
+</nav>

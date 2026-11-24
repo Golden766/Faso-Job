@@ -1,0 +1,184 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block title %}{{ title }} | Faso Job — Administration{% endblock %}
+
+{% block bodyclass %}{{ block.super }} editorial-dashboard backups{% endblock %}
+
+{% block content_title %}{% endblock %}
+{% block content_subtitle %}{% endblock %}
+
+{% block content %}
+<div class="dashboard-main">
+        <div class="dashboard-page-heading">
+            <div>
+                <p class="dashboard-eyebrow">Continuité de service</p>
+                <h1>Installer une sauvegarde</h1>
+                <p>
+                    Vérifiez ce que cette sauvegarde contient avant de
+                    l’installer sur le site.
+                </p>
+            </div>
+            <div class="dashboard-heading-actions">
+                <a class="dashboard-secondary-action" href="{{ backups_url }}">
+                    Retour aux sauvegardes
+                </a>
+            </div>
+        </div>
+
+        <section class="dashboard-section" aria-labelledby="warning-title">
+            <div class="dashboard-section-heading">
+                <h2 id="warning-title">Avant de continuer</h2>
+                <span>Cette opération remplace les données actuelles du site.</span>
+            </div>
+
+            <div class="dashboard-alert">
+                <span class="dashboard-alert__icon" aria-hidden="true">!</span>
+                <span class="dashboard-alert__body">
+                    <strong>Le contenu de la base va être remplacé</strong>
+                    <span>
+                        Toutes les tables présentes dans la sauvegarde sont
+                        vidées puis remplies. Les données créées depuis la
+                        date de la sauvegarde sont perdues. Une sauvegarde de
+                        sécurité de l’état actuel du site est produite juste
+                        avant l’écriture : elle permet de revenir en arrière.
+                    </span>
+                </span>
+            </div>
+        </section>
+
+        <section class="dashboard-section" aria-labelledby="file-title">
+            <div class="dashboard-section-heading">
+                <h2 id="file-title">Fichier</h2>
+                <span>La sauvegarde qui va être installée.</span>
+            </div>
+
+            <dl class="backup-details">
+                <div>
+                    <dt>Nom</dt>
+                    <dd>{{ preview.name }}</dd>
+                </div>
+                <div>
+                    <dt>Taille</dt>
+                    <dd>{{ preview.size|filesizeformat }}</dd>
+                </div>
+                <div>
+                    <dt>Tables</dt>
+                    <dd>{{ preview.table_count }}</dd>
+                </div>
+                <div>
+                    <dt>Lignes</dt>
+                    <dd>{{ preview.rows }}</dd>
+                </div>
+                {% if preview.exported_at %}
+                <div>
+                    <dt>Sauvegardée le</dt>
+                    <dd>{{ preview.exported_at }}</dd>
+                </div>
+                {% endif %}
+                <div>
+                    <dt>Fichiers joints</dt>
+                    <dd>
+                        {% if preview.has_media %}
+                        Inclus dans l’archive
+                        {% else %}
+                        Non
+                        {% endif %}
+                    </dd>
+                </div>
+            </dl>
+        </section>
+
+        <section class="dashboard-section" aria-labelledby="content-title">
+            <div class="dashboard-section-heading">
+                <h2 id="content-title">Contenu de la sauvegarde</h2>
+                <span>Ce que l’installation va écrire.</span>
+            </div>
+
+            {% if preview.missing_tables %}
+                <div class="dashboard-alert">
+                    <span class="dashboard-alert__icon" aria-hidden="true">!</span>
+                    <span class="dashboard-alert__body">
+                        <strong>Tables absentes de la base</strong>
+                        <span>
+                            Ces tables figurent dans la sauvegarde mais
+                            n’existent pas dans la base actuelle : elles ne
+                            seront pas créées.
+                        </span>
+                    </span>
+                </div>
+            {% endif %}
+
+            <div class="recent-offers-wrap">
+                <table class="recent-offers activity-table">
+                    <thead>
+                        <tr>
+                            <th>Table</th>
+                            <th>Lignes</th>
+                            <th>État</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for table in preview.tables %}
+                        <tr>
+                            <td>{{ table.name }}</td>
+                            <td>{{ table.rows }}</td>
+                            <td>
+                                {% if table.exists %}
+                                Présente
+                                {% else %}
+                                Absente de la base
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3">Cette sauvegarde ne contient aucune table.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="dashboard-section" aria-labelledby="confirm-title">
+            <div class="dashboard-section-heading">
+                <h2 id="confirm-title">Confirmer l’installation</h2>
+                <span>Recopiez le mot ci-dessous pour valider.</span>
+            </div>
+
+            <form method="post" class="backup-confirm-form">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="apply">
+
+                <div class="form-row">
+                    <label for="id_confirmation">
+                        Tapez <strong>{{ restore_word }}</strong> pour confirmer :
+                    </label>
+                    <input type="text" name="confirmation" id="id_confirmation"
+                           autocomplete="off" autocapitalize="characters"
+                           placeholder="{{ restore_word }}">
+                    <p class="help">
+                        Sans ce mot exact, rien n’est écrit : l’aperçu reste
+                        affiché et la base n’est pas touchée.
+                    </p>
+                </div>
+
+                <div class="submit-row">
+                    <input type="submit" class="backup-danger-submit"
+                           value="Installer la sauvegarde sur le site">
+                </div>
+            </form>
+        </section>
+
+        <aside class="dashboard-help">
+            <span class="dashboard-help-icon" aria-hidden="true">i</span>
+            <p>
+                <strong>Après l’installation :</strong> votre session
+                d’administration est fermée puis rouverte par la même
+                sauvegarde. Si vous êtes déconnecté, reconnectez-vous avec
+                vos identifiants habituels.
+            </p>
+        </aside>
+    </div>
+{% endblock %}

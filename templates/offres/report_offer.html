@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<section class="container section form-page">
+    <div class="form-intro">
+        <p class="eyebrow">Aidez-nous à vérifier</p>
+        <h1>{{ title }}</h1>
+        <p>Vous signalez : <strong>{{ offer.title }}</strong> — {{ offer.company_name }}</p>
+        <p>Votre signalement sera examiné par notre équipe. Il ne change pas automatiquement le statut de l’offre.</p>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="form-success" role="status">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <form class="public-form" method="post">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        {% for field in form %}
+            <div class="form-field">
+                <label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %}<span aria-hidden="true"> *</span>{% endif %}</label>
+                {{ field }}
+                {% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}
+                {% for error in field.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+            </div>
+        {% endfor %}
+        <div class="form-actions">
+            <button class="btn btn-primary" type="submit">Envoyer le signalement <span aria-hidden="true">→</span></button>
+            <a class="hero-text-link" href="{% url 'offer_detail' offer.slug %}">Annuler</a>
+        </div>
+    </form>
+</section>
+{% endblock %}

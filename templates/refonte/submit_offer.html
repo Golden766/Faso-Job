@@ -1,0 +1,298 @@
+{% extends "refonte/base.html" %}
+{% load static %}
+
+{% block title %}Proposer une annonce — Faso Job{% endblock %}
+{% block meta_description %}Proposez une offre d’emploi, un stage ou une mission au Burkina Faso. Faso Job examine chaque annonce et sa source avant publication.{% endblock %}
+{% block body_class %}has-bottom-nav has-submit-page{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/refonte/submit.css' %}">
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/submit_offer.js' %}?v=20261113-3" defer></script>
+{% endblock %}
+
+{% block content %}
+<div class="fj-submit-breadcrumb">
+    <div class="fj-container">
+        <nav class="fj-breadcrumb" aria-label="Fil d’Ariane">
+            <a href="{% url 'home' %}">Accueil</a>
+            <span class="fj-breadcrumb__separator" aria-hidden="true">/</span>
+            <span aria-current="page">Proposer une annonce</span>
+        </nav>
+    </div>
+</div>
+
+<header class="fj-submit-head">
+    <div class="fj-container">
+        <p class="fj-eyebrow">Contribution citoyenne &amp; RH</p>
+        <h1 class="fj-submit-head__title">Proposer une annonce ou une opportunité</h1>
+        <p class="fj-lead fj-submit-head__lead">
+            Vous êtes une entreprise, un recruteur, une organisation ou un particulier ?
+            Partagez une offre d’emploi, un stage ou une mission au Burkina Faso.
+            Chaque proposition est examinée avant publication.
+        </p>
+        <ul class="fj-submit-head__facts" role="list">
+            <li>
+                {% include "refonte/partials/icon.html" with name="shield-check" extra_class="fj-icon--sm" %}
+                Gratuit et sans intermédiaire
+            </li>
+            <li>
+                {% include "refonte/partials/icon.html" with name="eye" extra_class="fj-icon--sm" %}
+                Examen manuel avant publication
+            </li>
+            <li>
+                {% include "refonte/partials/icon.html" with name="lock" extra_class="fj-icon--sm" %}
+                Vos coordonnées restent privées
+            </li>
+        </ul>
+    </div>
+</header>
+
+<div class="fj-container fj-submit-layout">
+    <div class="fj-submit-main">
+        <section class="fj-alert fj-alert--warning fj-submit-inline-warning" aria-labelledby="fraud-inline-title">
+            {% include "refonte/partials/icon.html" with name="alert-triangle" extra_class="fj-icon--sm" %}
+            <div class="fj-alert__body">
+                <p class="fj-alert__title" id="fraud-inline-title">Rappel anti-fraude</p>
+                <p>
+                    Aucune offre sérieuse ne demande de payer des frais de dossier,
+                    une caution ou un test. Si on vous demande de l’argent,
+                    signalez-le.
+                </p>
+            </div>
+        </section>
+
+        {% if form.errors %}
+            <div class="fj-alert fj-alert--danger fj-submit-errors" role="alert" tabindex="-1" data-error-summary>
+                {% include "refonte/partials/icon.html" with name="alert-triangle" extra_class="fj-icon--sm" %}
+                <div class="fj-alert__body">
+                    <p class="fj-alert__title">Votre proposition n’a pas pu être envoyée.</p>
+                    <p>Corrigez les points suivants, puis renvoyez le formulaire.</p>
+                    <ul>
+                        {% for field in form %}
+                            {% if field.errors %}
+                                <li>
+                                    <a href="#{{ field.auto_id }}" data-error-target="{{ field.name }}">{{ field.label }}</a> :
+                                    {{ field.errors.0 }}
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                        {% for error in form.non_field_errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        {% endif %}
+
+        <form class="fj-form fj-submit-form" method="post" action="{% url 'submit_offer' %}" novalidate data-multistep-form>
+            {% csrf_token %}
+
+            <nav class="fj-form-progress" aria-label="Étapes de la proposition" data-step-navigation hidden>
+                <ol class="fj-form-progress__list">
+                    {% for section in form.numbered_sections %}
+                        <li>
+                            <button
+                                class="fj-form-progress__button{% if forloop.first %} is-current{% endif %}"
+                                type="button"
+                                data-step-trigger="{{ forloop.counter0 }}"
+                                aria-label="Étape {{ section.number }} : {{ section.title }}"
+                                aria-controls="submit-step-{{ section.number }}"
+                                {% if forloop.first %}aria-current="step"{% else %}disabled{% endif %}
+                            >
+                                <span class="fj-form-progress__number" data-step-number>{{ section.number }}</span>
+                                <span class="fj-form-progress__label">
+                                    {% if section.number == 1 %}Offre
+                                    {% elif section.number == 2 %}Description
+                                    {% elif section.number == 3 %}Candidature
+                                    {% elif section.number == 4 %}Contact
+                                    {% else %}Engagement
+                                    {% endif %}
+                                </span>
+                            </button>
+                        </li>
+                    {% endfor %}
+                </ol>
+                <div
+                    class="fj-form-progress__track"
+                    role="progressbar"
+                    aria-label="Progression du formulaire"
+                    aria-valuemin="1"
+                    aria-valuemax="{{ form.numbered_sections|length }}"
+                    aria-valuenow="1"
+                    data-step-progress
+                >
+                    <span data-step-progress-fill></span>
+                </div>
+                <p class="fj-form-progress__status" aria-live="polite" data-step-status>
+                    Étape 1 sur {{ form.numbered_sections|length }} — {{ form.numbered_sections.0.title }}
+                </p>
+            </nav>
+
+            {% for section in form.numbered_sections %}
+                <section
+                    class="fj-form-card"
+                    id="submit-step-{{ section.number }}"
+                    data-form-step="{{ forloop.counter0 }}"
+                    aria-labelledby="section-title-{{ section.number }}"
+                >
+                    <div class="fj-form-card__head">
+                        <span class="fj-form-card__number" aria-hidden="true">{{ section.number }}</span>
+                        <div>
+                            <h2 class="fj-form-card__title" id="section-title-{{ section.number }}">
+                                {{ section.title }}
+                            </h2>
+                            <p class="fj-form-card__description">{{ section.description }}</p>
+                        </div>
+                    </div>
+
+                    <div class="fj-submit-fields">
+                        {% for field in section.fields %}
+                            <div class="fj-field{% if field.name == 'details' or field.name == 'application_instructions' or field.name == 'required_documents' or field.name == 'employer_kind' or field.name == 'declarant_role' %} fj-field--wide{% endif %}{% if field.errors %} has-error{% endif %}">
+                                {% if field.name == 'ethics_commitment' %}
+                                    <label class="fj-check fj-ethics" for="{{ field.auto_id }}">
+                                        {{ field }}
+                                        <span>
+                                            {{ field.label }}
+                                            <span class="fj-field__required" aria-hidden="true">*</span>
+                                        </span>
+                                    </label>
+                                {% elif field.name == 'employer_kind' or field.name == 'declarant_role' %}
+                                    <fieldset class="fj-choice-fieldset">
+                                        <legend class="fj-field__legend">
+                                            {{ field.label }}
+                                            <span class="fj-field__required" aria-hidden="true">*</span>
+                                        </legend>
+                                        <div class="fj-choice-grid">
+                                            {% for choice in field %}
+                                                <label class="fj-choice" for="{{ choice.id_for_label }}">
+                                                    {{ choice.tag }}
+                                                    <span class="fj-choice__text">
+                                                        <span class="fj-choice__title">{{ choice.choice_label }}</span>
+                                                    </span>
+                                                </label>
+                                            {% endfor %}
+                                        </div>
+                                    </fieldset>
+                                {% else %}
+                                    <label for="{{ field.auto_id }}">
+                                        {{ field.label }}
+                                        {% if field.field.required %}<span class="fj-field__required" aria-hidden="true">*</span>{% endif %}
+                                    </label>
+                                    {{ field }}
+                                {% endif %}
+
+                                {% if field.help_text %}
+                                    <p class="fj-field__help" id="{{ field.auto_id }}_helptext">{{ field.help_text }}</p>
+                                {% endif %}
+                                {% if field.errors %}
+                                    <div id="{{ field.auto_id }}_error">
+                                        {% for error in field.errors %}
+                                            <p class="fj-field__error" role="alert">{{ error }}</p>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="fj-form-step-actions" data-step-actions hidden>
+                        {% if not forloop.first %}
+                            <button class="fj-btn fj-btn--secondary" type="button" data-step-previous>
+                                Étape précédente
+                            </button>
+                        {% endif %}
+                        {% if not forloop.last %}
+                            <button class="fj-btn fj-btn--primary" type="button" data-step-next>
+                                Continuer
+                                {% include "refonte/partials/icon.html" with name="arrow-right" extra_class="fj-icon--sm" %}
+                            </button>
+                        {% endif %}
+                    </div>
+                </section>
+            {% endfor %}
+
+            <div class="fj-submit-actions" data-submit-actions>
+                <button class="fj-btn fj-btn--primary fj-btn--lg" type="submit">
+                    {% include "refonte/partials/icon.html" with name="send" %}
+                    Soumettre l’annonce pour vérification
+                </button>
+                <p class="fj-small fj-text-muted">
+                    Votre proposition est enregistrée en attente de contrôle.
+                    Elle ne sera jamais publiée automatiquement.
+                </p>
+            </div>
+        </form>
+    </div>
+
+    <aside class="fj-submit-aside" aria-label="Informations sur la vérification">
+        <section class="fj-panel fj-submit-panel" aria-labelledby="verification-title">
+            <h2 class="fj-submit-panel__title" id="verification-title">
+                {% include "refonte/partials/icon.html" with name="shield-check" extra_class="fj-icon--sm" %}
+                Comment nous vérifions
+            </h2>
+            <ol class="fj-submit-steps">
+                <li>
+                    <span class="fj-submit-steps__number" aria-hidden="true">1</span>
+                    <div>
+                        <strong>Contrôle de la source</strong>
+                        <span>Nous comparons l’annonce à sa source publique ou au recruteur.</span>
+                    </div>
+                </li>
+                <li>
+                    <span class="fj-submit-steps__number" aria-hidden="true">2</span>
+                    <div>
+                        <strong>Vérification de l’employeur</strong>
+                        <span>Nous cherchons à confirmer l’identité de l’employeur.</span>
+                    </div>
+                </li>
+                <li>
+                    <span class="fj-submit-steps__number" aria-hidden="true">3</span>
+                    <div>
+                        <strong>Publication après validation</strong>
+                        <span>Aucune annonce n’est mise en ligne avant cet examen.</span>
+                    </div>
+                </li>
+            </ol>
+        </section>
+
+        <section class="fj-alert fj-alert--warning fj-submit-warning" aria-labelledby="fraud-title">
+            {% include "refonte/partials/icon.html" with name="alert-triangle" extra_class="fj-icon--sm" %}
+            <div class="fj-alert__body">
+                <p class="fj-alert__title" id="fraud-title">Rappel anti-fraude</p>
+                <p>
+                    Aucune offre sérieuse ne demande de payer des frais de dossier,
+                    une caution ou un test. Si on vous demande de l’argent,
+                    signalez-le.
+                </p>
+                <a class="fj-link" href="{% url 'method' %}#controle-des-annonces">Voir notre méthode de contrôle</a>
+            </div>
+        </section>
+
+        <section class="fj-panel fj-submit-panel" aria-labelledby="privacy-title">
+            <h2 class="fj-submit-panel__title" id="privacy-title">
+                {% include "refonte/partials/icon.html" with name="lock" extra_class="fj-icon--sm" %}
+                Ce qui reste privé
+            </h2>
+            <p class="fj-small fj-text-muted">
+                Votre e-mail et votre téléphone servent uniquement à vérifier l’annonce.
+                Ils ne sont jamais publiés sur la fiche de l’offre.
+            </p>
+        </section>
+
+        <section class="fj-panel fj-submit-panel" aria-labelledby="free-title">
+            <h2 class="fj-submit-panel__title" id="free-title">
+                {% include "refonte/partials/icon.html" with name="info" extra_class="fj-icon--sm" %}
+                Gratuit et ouvert
+            </h2>
+            <p class="fj-small fj-text-muted">
+                Proposer une annonce est gratuit. La publication reste soumise
+                à la vérification de la source et de l’employeur.
+            </p>
+            <a class="fj-link" href="{% url 'catalogue' %}">Consulter les offres publiées</a>
+        </section>
+    </aside>
+</div>
+{% endblock %}

@@ -1,0 +1,94 @@
+{% extends "admin/base_site.html" %}
+{% load static admin_ui %}
+
+{% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | Faso Job - Administration{% endblock %}
+
+{% block extrastyle %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'css/refonte/tokens.css' %}">
+{% endblock %}
+
+{% block responsive %}
+    {{ block.super }}
+    {% comment %}
+    admin.css doit etre charge APRES responsive.css de Django : sinon les
+    regles par defaut de Django (grilles, champs de formulaire, colonnes)
+    reprennent la main sur l'habillage du site public.
+    {% endcomment %}
+    <link rel="stylesheet" href="{% static 'css/admin.css' %}?v=20261120-1">
+{% endblock %}
+
+{% block branding %}
+<div id="site-name">
+    <a href="{% url 'admin:index' %}" class="fj-admin-brand">
+        <span class="fj-admin-brand__mark" aria-hidden="true">FJ</span>
+        <span class="fj-admin-brand__text">
+            <strong>Faso Job</strong>
+            <small>Administration</small>
+        </span>
+    </a>
+</div>
+{% endblock %}
+
+{% block nav-sidebar %}
+{% include "admin/partials/sidebar.html" %}
+{% endblock %}
+
+{% block nav-breadcrumbs %}
+<nav class="fj-admin-breadcrumbs" aria-label="Fil d'Ariane">
+    {% admin_breadcrumbs %}
+</nav>
+{% endblock %}
+
+{% block nav-global %}
+{% if has_permission %}
+<nav class="fj-admin-nav" aria-label="Navigation d'administration">
+    <details class="fj-admin-menu">
+        <summary>Offres</summary>
+        <div class="fj-admin-menu__panel">
+            <a href="{% url 'admin:offres_offer_changelist' %}">Offres</a>
+            {% if perms.offres.view_offer %}<a href="{% url 'admin-expired-offers' %}">Offres expirées</a>{% endif %}
+            {% if perms.offres.view_offersubmission %}<a href="{% url 'admin:offres_offersubmission_changelist' %}">Soumissions</a>{% endif %}
+            {% if perms.offres.view_offerreport %}<a href="{% url 'admin:offres_offerreport_changelist' %}">Signalements</a>{% endif %}
+            {% if perms.offres.view_blacklistedcontact %}<a href="{% url 'admin:offres_blacklistedcontact_changelist' %}">Liste noire</a>{% endif %}
+        </div>
+    </details>
+    <details class="fj-admin-menu">
+        <summary>Référentiel</summary>
+        <div class="fj-admin-menu__panel">
+            {% if perms.offres.view_source %}<a href="{% url 'admin:offres_source_changelist' %}">Sources</a>{% endif %}
+            {% if perms.offres.view_category %}<a href="{% url 'admin:offres_category_changelist' %}">Catégories</a>{% endif %}
+        </div>
+    </details>
+    <details class="fj-admin-menu">
+        <summary>Pilotage</summary>
+        <div class="fj-admin-menu__panel">
+            <a href="{% url 'admin-activity-report' %}">Rapport d’activité</a>
+            {% if perms.offres.view_outboundmessage %}<a href="{% url 'admin:offres_outboundmessage_changelist' %}">Messages envoyés</a>{% endif %}
+            {% if perms.offres.view_notificationrecipient %}<a href="{% url 'admin:offres_notificationrecipient_changelist' %}">Notifications</a>{% endif %}
+            <a href="{% url 'admin-backups' %}">Sauvegardes</a>
+        </div>
+    </details>
+    <details class="fj-admin-menu">
+        <summary>Réglages</summary>
+        <div class="fj-admin-menu__panel">
+            {% if perms.offres.view_platformsettings %}<a href="{% url 'admin:offres_platformsettings_change' 1 %}">Paramètres</a>{% endif %}
+            {% if perms.auth.view_user %}<a href="{% url 'admin:auth_user_changelist' %}">Utilisateurs</a>{% endif %}
+            {% if perms.auth.view_group %}<a href="{% url 'admin:auth_group_changelist' %}">Rôles</a>{% endif %}
+            <a href="{% url 'two_factor_settings' %}">Sécurité du compte</a>
+            {% if perms.offres.view_twofactordevice %}<a href="{% url 'admin:offres_twofactordevice_changelist' %}">Appareils 2FA</a>{% endif %}
+        </div>
+    </details>
+    <a class="fj-admin-nav__external" href="{% url 'home' %}" target="_blank" rel="noopener">Voir le site public</a>
+</nav>
+{% endif %}
+{% endblock %}
+
+{% block welcome-msg %}Connecté en tant que <strong>{% firstof user.get_short_name user.get_username %}</strong>{% endblock %}
+
+{% block footer %}
+<div class="fj-admin-footer-inner">
+    <span><strong>Faso Job</strong> - Opportunités professionnelles au Burkina Faso</span>
+    <span>Administration éditoriale</span>
+</div>
+{% endblock %}

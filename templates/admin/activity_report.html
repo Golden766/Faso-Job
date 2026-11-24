@@ -1,0 +1,312 @@
+{% extends "admin/base_site.html" %}
+{% load static l10n %}
+
+{% block title %}{{ title }} | Faso Job — Administration{% endblock %}
+
+{% block bodyclass %}{{ block.super }} editorial-dashboard activity-report{% endblock %}
+
+{% block content_title %}{% endblock %}
+{% block content_subtitle %}{% endblock %}
+
+{% block content %}
+<div class="dashboard-main">
+        <div class="dashboard-page-heading">
+            <div>
+                <p class="dashboard-eyebrow">Pilotage éditorial</p>
+                <h1>Rapport d’activité</h1>
+                <p>
+                    Synthèse calculée à partir des offres, propositions et signalements
+                    enregistrés sur la plateforme.
+                    <span class="dashboard-date">
+                        Généré le {{ generated_at|date:"d/m/Y à H:i" }}
+                    </span>
+                </p>
+            </div>
+            <div class="dashboard-heading-actions">
+                <a class="dashboard-secondary-action" href="{{ csv_url }}">Exporter en CSV</a>
+                <a class="dashboard-primary-action" href="{% url 'admin:offres_offer_changelist' %}">
+                    Voir les offres
+                </a>
+            </div>
+        </div>
+
+        <section class="dashboard-metrics" aria-label="Indicateurs principaux">
+            <div class="metric-card">
+                <span>Offres publiées</span>
+                <strong>{{ published_total }}</strong>
+                <small>{{ active_total }} active{{ active_total|pluralize }} aujourd’hui</small>
+            </div>
+            <div class="metric-card">
+                <span>Propositions reçues</span>
+                <strong>{{ submission_total }}</strong>
+                <small>
+                    Taux d’acceptation :
+                    {% if acceptance_rate is not None %}{{ acceptance_rate }} %{% else %}—{% endif %}
+                </small>
+            </div>
+            <div class="metric-card">
+                <span>Consultations de fiches</span>
+                <strong>{{ view_total }}</strong>
+                <small>Compteur interne, jamais affich&eacute; au public</small>
+            </div>
+            <div class="metric-card">
+                <span>Clics vers un canal</span>
+                <strong>{{ click_total }}</strong>
+                <small>Vers WhatsApp, e-mail, t&eacute;l&eacute;phone ou d&eacute;p&ocirc;t physique</small>
+            </div>
+            <div class="metric-card metric-card--danger">
+                <span>Signalements ouverts</span>
+                <strong>{{ open_reports }}</strong>
+                <small>{{ report_total }} signalement{{ report_total|pluralize }} au total</small>
+            </div>
+            <div class="metric-card">
+                <span>Traitement des signalements</span>
+                <strong>
+                    {% if handling_rate is not None %}{{ handling_rate }} %{% else %}—{% endif %}
+                </strong>
+                <small>{{ handled_reports }} traité{{ handled_reports|pluralize }} sur {{ report_total }}</small>
+            </div>
+        </section>
+
+        <section class="dashboard-section" aria-labelledby="activity-months-title">
+            <div class="dashboard-section-heading">
+                <h2 id="activity-months-title">Activité des six derniers mois</h2>
+                <span>Offres publiées, propositions reçues et signalements enregistrés.</span>
+            </div>
+            <div class="recent-offers-wrap">
+                <table class="recent-offers activity-table">
+                    <thead>
+                        <tr>
+                            <th>Mois</th>
+                            <th>Offres publiées</th>
+                            <th>Propositions reçues</th>
+                            <th>Signalements reçus</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in monthly_rows %}
+                        <tr>
+                            <td>{{ row.label|capfirst }}</td>
+                            <td>{{ row.offers }}</td>
+                            <td>{{ row.submissions }}</td>
+                            <td>{{ row.reports }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <div class="activity-grid">
+            <section class="dashboard-section activity-panel" aria-labelledby="offer-status-title">
+                <div class="dashboard-section-heading">
+                    <h2 id="offer-status-title">Statut des offres</h2>
+                    <span>{{ offer_total }} offre{{ offer_total|pluralize }}</span>
+                </div>
+                <ul class="activity-breakdown">
+                    {% for row in offer_status_rows %}
+                    <li>
+                        <span class="activity-breakdown__label">{{ row.label }}</span>
+                        <span class="activity-breakdown__value">{{ row.count }}</span>
+                        <progress class="activity-progress" value="{% localize off %}{{ row.share|default:0 }}{% endlocalize %}" max="100">{{ row.share|default:0 }} %</progress>
+                        <span class="activity-breakdown__share">
+                            {% if row.share is not None %}{{ row.share }} %{% else %}—{% endif %}
+                        </span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </section>
+
+            <section class="dashboard-section activity-panel" aria-labelledby="submission-status-title">
+                <div class="dashboard-section-heading">
+                    <h2 id="submission-status-title">Statut des propositions</h2>
+                    <span>{{ submission_total }} proposition{{ submission_total|pluralize }}</span>
+                </div>
+                <ul class="activity-breakdown">
+                    {% for row in submission_status_rows %}
+                    <li>
+                        <span class="activity-breakdown__label">{{ row.label }}</span>
+                        <span class="activity-breakdown__value">{{ row.count }}</span>
+                        <progress class="activity-progress" value="{% localize off %}{{ row.share|default:0 }}{% endlocalize %}" max="100">{{ row.share|default:0 }} %</progress>
+                        <span class="activity-breakdown__share">
+                            {% if row.share is not None %}{{ row.share }} %{% else %}—{% endif %}
+                        </span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </section>
+
+            <section class="dashboard-section activity-panel" aria-labelledby="report-status-title">
+                <div class="dashboard-section-heading">
+                    <h2 id="report-status-title">Statut des signalements</h2>
+                    <span>{{ report_total }} signalement{{ report_total|pluralize }}</span>
+                </div>
+                <ul class="activity-breakdown">
+                    {% for row in report_status_rows %}
+                    <li>
+                        <span class="activity-breakdown__label">{{ row.label }}</span>
+                        <span class="activity-breakdown__value">{{ row.count }}</span>
+                        <progress class="activity-progress" value="{% localize off %}{{ row.share|default:0 }}{% endlocalize %}" max="100">{{ row.share|default:0 }} %</progress>
+                        <span class="activity-breakdown__share">
+                            {% if row.share is not None %}{{ row.share }} %{% else %}—{% endif %}
+                        </span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </section>
+        </div>
+
+        <section class="dashboard-section" aria-labelledby="report-reasons-title">
+            <div class="dashboard-section-heading">
+                <h2 id="report-reasons-title">Motifs de signalement</h2>
+                <span>Répartition des signalements enregistrés, tous états confondus.</span>
+            </div>
+            <div class="recent-offers-wrap">
+                <table class="recent-offers activity-table">
+                    <thead>
+                        <tr>
+                            <th>Motif</th>
+                            <th>Signalements</th>
+                            <th>Part</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in report_reason_rows %}
+                        <tr>
+                            <td>{{ row.label }}</td>
+                            <td>{{ row.count }}</td>
+                            <td>{% if row.share is not None %}{{ row.share }} %{% else %}—{% endif %}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="dashboard-section" aria-labelledby="blacklist-title">
+            <div class="dashboard-section-heading">
+                <h2 id="blacklist-title">Sécurité et liste noire</h2>
+                <span>Registre privé des coordonnées frauduleuses, réservé à l'administration.</span>
+            </div>
+            <div class="recent-offers-wrap">
+                <table class="recent-offers activity-table">
+                    <thead>
+                        <tr>
+                            <th>Statut du contact</th>
+                            <th>Contacts</th>
+                            <th>Part</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in blacklist_status_rows %}
+                        <tr>
+                            <td>{{ row.label }}</td>
+                            <td>{{ row.count }}</td>
+                            <td>{% if row.share is not None %}{{ row.share }} %{% else %}—{% endif %}</td>
+                        </tr>
+                        {% endfor %}
+                        <tr>
+                            <td>Alertes diffusées manuellement</td>
+                            <td>{{ blacklist_alerts }}</td>
+                            <td>—</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="dashboard-section" aria-labelledby="audience-title">
+            <div class="dashboard-section-heading">
+                <h2 id="audience-title">Offres les plus consultées</h2>
+                <span>Consultations de fiches et clics vers un canal de candidature.</span>
+            </div>
+            <div class="recent-offers-wrap">
+                <table class="recent-offers activity-table">
+                    <thead>
+                        <tr>
+                            <th>Offre</th>
+                            <th>Entreprise</th>
+                            <th>Consultations</th>
+                            <th>Clics sortants</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in top_viewed_offers %}
+                        <tr>
+                            <td>{{ row.title }}</td>
+                            <td>{{ row.company_name|default:"Non précisée" }}</td>
+                            <td>{{ row.view_count }}</td>
+                            <td>{{ row.click_count }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4">Aucune fiche consultée pour le moment.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="dashboard-section" aria-labelledby="click-title">
+            <div class="dashboard-section-heading">
+                <h2 id="click-title">Clics sortants par canal</h2>
+                <span>Vers quel canal les candidats se sont dirigés.</span>
+            </div>
+            <div class="recent-offers-wrap">
+                <table class="recent-offers activity-table">
+                    <thead>
+                        <tr>
+                            <th>Canal</th>
+                            <th>Clics</th>
+                            <th>Part</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in click_channel_rows %}
+                        <tr>
+                            <td>{{ row.label }}</td>
+                            <td>{{ row.count }}</td>
+                            <td>{% if row.share is not None %}{{ row.share }} %{% else %}—{% endif %}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="dashboard-section" aria-labelledby="summary-title">
+            <div class="dashboard-section-heading">
+                <h2 id="summary-title">Synthèse chiffrée</h2>
+                <span>Valeurs brutes utilisées pour le rapport et l’export CSV.</span>
+            </div>
+            <div class="recent-offers-wrap">
+                <table class="recent-offers activity-table activity-table--summary">
+                    <thead>
+                        <tr>
+                            <th>Indicateur</th>
+                            <th>Valeur</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in summary_rows %}
+                        <tr>
+                            <td>{{ row.label }}</td>
+                            <td>{{ row.value }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <aside class="dashboard-help">
+            <span class="dashboard-help-icon" aria-hidden="true">i</span>
+            <p>
+                Ce rapport ne contient aucune estimation : chaque valeur est comptée
+                directement dans la base. L’export CSV reprend les mêmes indicateurs,
+                les répartitions par statut et l’activité mensuelle.
+            </p>
+        </aside>
+    </div>
+{% endblock %}

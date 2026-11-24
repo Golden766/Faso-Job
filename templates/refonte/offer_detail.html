@@ -1,0 +1,498 @@
+{% extends "refonte/base.html" %}
+{% load static %}
+
+{% block title %}{{ offer.title }} — Faso Job{% endblock %}
+{% block meta_description %}{{ meta_description }}{% endblock %}
+{% block body_class %}has-bottom-nav has-detail-apply{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/refonte/detail.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="fj-detail-breadcrumb-wrap">
+    <div class="fj-container">
+        <nav class="fj-breadcrumb" aria-label="Fil d’Ariane">
+            <a href="{% url 'home' %}">Accueil</a>
+            <span class="fj-breadcrumb__separator" aria-hidden="true">/</span>
+            <a href="{% url 'catalogue' %}">Offres</a>
+            {% if offer.category %}
+                <span class="fj-breadcrumb__separator" aria-hidden="true">/</span>
+                <span>{{ offer.category.name }}</span>
+            {% elif offer.employment_type %}
+                <span class="fj-breadcrumb__separator" aria-hidden="true">/</span>
+                <a href="{% url 'catalogue' %}?type={{ offer.employment_type|urlencode }}">{{ offer.employment_type }}</a>
+            {% endif %}
+            <span class="fj-breadcrumb__separator" aria-hidden="true">/</span>
+            <span aria-current="page">{{ offer.title }}</span>
+        </nav>
+    </div>
+</div>
+
+<header class="fj-detail-head">
+    <div class="fj-container">
+        <div class="fj-detail-head__top">
+            <a class="fj-back-link" href="{% url 'catalogue' %}">
+                {% include "refonte/partials/icon.html" with name="arrow-left" extra_class="fj-icon--sm" %}
+                Retour aux opportunités
+            </a>
+            <div class="fj-cluster">
+                <button
+                    class="fj-btn fj-btn--secondary fj-btn--sm fj-favorite-button"
+                    type="button"
+                    data-favorite-toggle
+                    data-favorite-id="{{ offer.pk }}"
+                    data-favorite-title="{{ offer.title }}"
+                    data-favorite-company="{{ offer.company_name|default:'Employeur non précisé' }}"
+                    data-favorite-url="{% url 'offer_detail' offer.slug %}"
+                    aria-pressed="false"
+                    hidden
+                >
+                    {% include "refonte/partials/icon.html" with name="heart" extra_class="fj-icon--sm" %}
+                    <span data-favorite-label>Ajouter aux favoris</span>
+                </button>
+                <button class="fj-btn fj-btn--secondary fj-btn--sm" type="button" data-copy-link>
+                    {% include "refonte/partials/icon.html" with name="share" extra_class="fj-icon--sm" %}
+                    Partager l’offre
+                </button>
+            </div>
+        </div>
+
+        <div class="fj-detail-employer">
+            <span class="fj-detail-employer__mark" aria-hidden="true">
+                {% if offer.employer_kind == 'individual' %}
+                    {% include "refonte/partials/icon.html" with name="user" %}
+                {% else %}
+                    {% include "refonte/partials/icon.html" with name="building" %}
+                {% endif %}
+            </span>
+            <div>
+                <p class="fj-detail-employer__name">{{ offer.company_name|default:"Employeur non précisé" }}</p>
+                <p class="fj-small fj-text-muted">
+                    {% if offer.category %}{{ offer.category.name }}{% else %}Opportunité professionnelle{% endif %}
+                </p>
+            </div>
+        </div>
+
+        <h1 class="fj-detail-title">{{ offer.title }}</h1>
+
+        <div class="fj-detail-meta">
+            {% if offer.location %}
+                <span class="fj-detail-meta__item">
+                    {% include "refonte/partials/icon.html" with name="map-pin" extra_class="fj-icon--sm" %}
+                    {{ offer.location }}
+                </span>
+            {% endif %}
+            {% if offer.employment_type %}
+                <span class="fj-detail-meta__item">
+                    {% include "refonte/partials/icon.html" with name="briefcase" extra_class="fj-icon--sm" %}
+                    {{ offer.employment_type }}
+                </span>
+            {% endif %}
+            {% if offer.published_at %}
+                <span class="fj-detail-meta__item">
+                    {% include "refonte/partials/icon.html" with name="calendar" extra_class="fj-icon--sm" %}
+                    Publié le {{ offer.published_at|date:"d/m/Y" }}
+                </span>
+            {% endif %}
+            <span class="fj-detail-meta__item{% if deadline_urgency == 'expired' or deadline_urgency == 'last-day' or deadline_urgency == 'urgent' %} fj-text-danger{% elif deadline_urgency == 'soon' %} fj-text-primary{% endif %}">
+                {% include "refonte/partials/icon.html" with name="clock" extra_class="fj-icon--sm" %}
+                {% if days_until_deadline is None %}
+                    Date de clôture non précisée
+                {% elif days_until_deadline > 0 %}
+                    {{ days_until_deadline }} jour{{ days_until_deadline|pluralize }} restant{{ days_until_deadline|pluralize }} avant la clôture
+                {% elif days_until_deadline == 0 %}
+                    Clôture aujourd’hui
+                {% else %}
+                    Date limite dépassée de {{ days_since_deadline }} jour{{ days_since_deadline|pluralize }}
+                {% endif %}
+            </span>
+        </div>
+
+        <div class="fj-detail-badges">
+            {% if applications_open %}
+                <span class="fj-badge fj-badge--success">
+                    {% include "refonte/partials/icon.html" with name="check-circle" %} Candidature ouverte
+                </span>
+            {% else %}
+                <span class="fj-badge fj-badge--danger">
+                    {% include "refonte/partials/icon.html" with name="x-circle" %} Candidature fermée
+                </span>
+            {% endif %}
+            {% if offer.source %}
+                {% if offer.is_source_confirmed %}
+                    <span class="fj-badge fj-badge--info">
+                        {% include "refonte/partials/icon.html" with name="external-link" %} Source vérifiée
+                    </span>
+                {% else %}
+                    <span class="fj-badge fj-badge--danger">
+                        {% include "refonte/partials/icon.html" with name="alert-triangle" %} Source non vérifiée
+                    </span>
+                {% endif %}
+            {% endif %}
+            {% if offer.is_employer_verified %}
+                <span class="fj-badge fj-badge--success">
+                    {% include "refonte/partials/icon.html" with name="shield-check" %} {{ offer.employer_verification_label }}
+                </span>
+            {% else %}
+                <span class="fj-badge fj-badge--neutral">
+                    {% include "refonte/partials/icon.html" with name="info" %} {{ offer.employer_verification_label }}
+                </span>
+            {% endif %}
+            {% if offer.availability_confirmed_at %}
+                <span class="fj-badge fj-badge--success">
+                    {% include "refonte/partials/icon.html" with name="check" %} Disponibilité confirmée
+                </span>
+            {% endif %}
+        </div>
+
+        <p class="fj-sr-only" role="status" data-share-status></p>
+    </div>
+</header>
+
+<div class="fj-container fj-detail-layout">
+    <div class="fj-detail-main">
+        <section class="fj-panel" aria-labelledby="essentials-title">
+            <h2 class="fj-h3" id="essentials-title">Informations essentielles</h2>
+            <dl class="fj-facts">
+                {% if offer.employment_type %}
+                    <div class="fj-fact">
+                        <dt>{% include "refonte/partials/icon.html" with name="briefcase" extra_class="fj-icon--sm" %}Type d’opportunité</dt>
+                        <dd>{{ offer.employment_type }}</dd>
+                    </div>
+                {% endif %}
+
+                {% if offer.salary_min is not None or offer.salary_max is not None or offer.salary_note %}
+                    <div class="fj-fact">
+                        <dt>{% include "refonte/partials/icon.html" with name="credit-card" extra_class="fj-icon--sm" %}Rémunération</dt>
+                        <dd>
+                            {% if offer.salary_min is not None and offer.salary_max is not None %}
+                                {{ offer.salary_min|floatformat:0 }} – {{ offer.salary_max|floatformat:0 }} {{ offer.salary_currency }}
+                            {% elif offer.salary_min is not None %}
+                                À partir de {{ offer.salary_min|floatformat:0 }} {{ offer.salary_currency }}
+                            {% elif offer.salary_max is not None %}
+                                Jusqu’à {{ offer.salary_max|floatformat:0 }} {{ offer.salary_currency }}
+                            {% endif %}
+                            {% if offer.salary_note %}
+                                <span class="fj-fact__note">{{ offer.salary_note }}</span>
+                            {% endif %}
+                        </dd>
+                    </div>
+                {% endif %}
+
+                {% if offer.experience_required %}
+                    <div class="fj-fact">
+                        <dt>{% include "refonte/partials/icon.html" with name="users" extra_class="fj-icon--sm" %}Expérience requise</dt>
+                        <dd>{{ offer.experience_required }}</dd>
+                    </div>
+                {% endif %}
+
+                {% if offer.required_education %}
+                    <div class="fj-fact">
+                        <dt>{% include "refonte/partials/icon.html" with name="graduation" extra_class="fj-icon--sm" %}Niveau d’études</dt>
+                        <dd>{{ offer.required_education }}</dd>
+                    </div>
+                {% endif %}
+
+                {% if offer.location %}
+                    <div class="fj-fact">
+                        <dt>{% include "refonte/partials/icon.html" with name="map-pin" extra_class="fj-icon--sm" %}Lieu</dt>
+                        <dd>{{ offer.location }}</dd>
+                    </div>
+                {% endif %}
+
+                {% if offer.schedule %}
+                    <div class="fj-fact">
+                        <dt>{% include "refonte/partials/icon.html" with name="clock" extra_class="fj-icon--sm" %}Horaires</dt>
+                        <dd>{{ offer.schedule }}</dd>
+                    </div>
+                {% endif %}
+
+                {% if offer.deadline %}
+                    <div class="fj-fact">
+                        <dt>{% include "refonte/partials/icon.html" with name="calendar" extra_class="fj-icon--sm" %}Date limite</dt>
+                        <dd>
+                            {{ offer.deadline|date:"d/m/Y" }}{% if offer.deadline_time %} à {{ offer.deadline_time|time:"H:i" }}{% endif %}
+                            {% if deadline_urgency == 'expired' %}
+                                <span class="fj-fact__note fj-text-danger">Date dépassée de {{ days_since_deadline }} jour{{ days_since_deadline|pluralize }}</span>
+                            {% elif days_until_deadline == 0 %}
+                                <span class="fj-fact__note fj-text-danger">Dernier jour pour postuler</span>
+                            {% elif days_until_deadline %}
+                                <span class="fj-fact__note">Reste {{ days_until_deadline }} jour{{ days_until_deadline|pluralize }}</span>
+                            {% endif %}
+                        </dd>
+                    </div>
+                {% endif %}
+
+                {% if offer.published_at %}
+                    <div class="fj-fact">
+                        <dt>{% include "refonte/partials/icon.html" with name="calendar" extra_class="fj-icon--sm" %}Date de publication</dt>
+                        <dd>{{ offer.published_at|date:"d/m/Y" }}</dd>
+                    </div>
+                {% endif %}
+            </dl>
+        </section>
+
+        <section class="fj-panel" aria-labelledby="about-title">
+            <h2 class="fj-h3" id="about-title">À propos du poste</h2>
+            {% if offer.description %}
+                <div class="fj-prose">{{ offer.description|linebreaks }}</div>
+            {% else %}
+                <p class="fj-small fj-text-muted">La description du poste n’a pas été précisée.</p>
+            {% endif %}
+        </section>
+
+        {% if offer.missions %}
+            <section class="fj-panel" aria-labelledby="missions-title">
+                <h2 class="fj-h3" id="missions-title">Missions du poste</h2>
+                <div class="fj-prose">{{ offer.missions|linebreaks }}</div>
+            </section>
+        {% endif %}
+
+        {% if offer.required_profile %}
+            <section class="fj-panel" aria-labelledby="profile-title">
+                <h2 class="fj-h3" id="profile-title">Profil recherché</h2>
+                <div class="fj-prose">{{ offer.required_profile|linebreaks }}</div>
+            </section>
+        {% endif %}
+
+        {% if offer.required_documents %}
+            <section class="fj-panel" aria-labelledby="documents-title">
+                <h2 class="fj-h3" id="documents-title">Dossier de candidature à fournir</h2>
+                <div class="fj-prose">{{ offer.required_documents|linebreaks }}</div>
+            </section>
+        {% endif %}
+
+        <section class="fj-panel" aria-labelledby="trace-title">
+            <h2 class="fj-h3" id="trace-title">Traçabilité et contrôle</h2>
+            <ul class="fj-verify-list">
+                {% if offer.source %}
+                    <li class="{% if offer.is_source_confirmed %}is-ok{% else %}is-warn{% endif %}">
+                        <span class="fj-verify-list__icon">
+                            {% if offer.is_source_confirmed %}
+                                {% include "refonte/partials/icon.html" with name="check-circle" %}
+                            {% else %}
+                                {% include "refonte/partials/icon.html" with name="alert-triangle" %}
+                            {% endif %}
+                        </span>
+                        <div>
+                            <strong>Source : {{ offer.source.name }}</strong>
+                            <span>
+                                {% if offer.is_source_confirmed %}Source vérifiée{% else %}Source non vérifiée{% endif %}
+                            </span>
+                            {% if offer.source.url %}
+                                <a class="fj-link" href="{{ offer.source.url }}" target="_blank" rel="noopener noreferrer">
+                                    Consulter la publication source
+                                    {% include "refonte/partials/icon.html" with name="external-link" extra_class="fj-icon--sm" %}
+                                </a>
+                            {% endif %}
+                        </div>
+                    </li>
+                {% endif %}
+
+                <li class="{% if offer.is_employer_verified %}is-ok{% else %}is-warn{% endif %}">
+                    <span class="fj-verify-list__icon">
+                        {% if offer.is_employer_verified %}
+                            {% include "refonte/partials/icon.html" with name="check-circle" %}
+                        {% else %}
+                            {% include "refonte/partials/icon.html" with name="info" %}
+                        {% endif %}
+                    </span>
+                    <div>
+                        <strong>{{ offer.employer_verification_label }}</strong>
+                        <span>
+                            {% if offer.is_employer_verified %}
+                                L’identité de l’employeur a été contrôlée par notre équipe.
+                            {% else %}
+                                L’identité de l’employeur n’a pas encore été contrôlée.
+                            {% endif %}
+                        </span>
+                    </div>
+                </li>
+
+                <li class="{% if applications_open %}is-ok{% else %}is-warn{% endif %}">
+                    <span class="fj-verify-list__icon">
+                        {% if applications_open %}
+                            {% include "refonte/partials/icon.html" with name="check-circle" %}
+                        {% else %}
+                            {% include "refonte/partials/icon.html" with name="x-circle" %}
+                        {% endif %}
+                    </span>
+                    <div>
+                        <strong>{% if applications_open %}Disponibilité confirmée{% else %}Candidatures fermées{% endif %}</strong>
+                        <span>
+                            {% if offer.availability_confirmed_at %}
+                                Dernière confirmation le {{ offer.availability_confirmed_at|date:"d/m/Y" }}.
+                            {% elif applications_open %}
+                                L’offre est publiée comme toujours disponible.
+                            {% else %}
+                                L’offre n’accepte plus de candidatures.
+                            {% endif %}
+                        </span>
+                    </div>
+                </li>
+            </ul>
+
+            <div class="fj-alert fj-alert--warning">
+                {% include "refonte/partials/icon.html" with name="alert-triangle" extra_class="fj-icon--lg" %}
+                <div class="fj-alert__body">
+                    <p class="fj-alert__title">Rappel de vigilance</p>
+                    <p>
+                        Aucun recruteur sérieux ne demande d’argent, de frais de dossier,
+                        d’avance pour un test ou un transfert Mobile Money pour examiner
+                        une candidature. En cas de demande, interrompez les échanges et
+                        signalez l’annonce.
+                    </p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <aside class="fj-detail-aside" aria-label="Candidature et informations complémentaires">
+        <section class="fj-panel fj-apply-card" id="application" aria-labelledby="application-title">
+            <div class="fj-apply-card__head">
+                <p class="fj-eyebrow">Candidature</p>
+                <span class="fj-apply-card__state {% if applications_open %}is-open{% else %}is-closed{% endif %}">
+                    {% if applications_open %}Ouverte{% else %}Fermée{% endif %}
+                </span>
+            </div>
+            <h2 class="fj-h3" id="application-title">Comment postuler ?</h2>
+            <p class="fj-small fj-text-muted">{{ offer.application_channel_label }}</p>
+
+            {% if applications_open %}
+                {% if offer.application_instructions %}
+                    <div class="fj-apply-instructions">{{ offer.application_instructions|linebreaks }}</div>
+                {% endif %}
+
+                {% if application_cta_url %}
+                    <a
+                        class="fj-btn fj-btn--lg fj-btn--block {% if application_cta_is_whatsapp %}fj-btn--whatsapp{% else %}fj-btn--solid{% endif %}"
+                        href="{{ application_cta_url }}"
+                        {% if application_cta_external %}target="_blank" rel="noopener noreferrer"{% endif %}
+                    >
+                        {% if application_cta_is_whatsapp %}
+                            {% include "refonte/partials/icon.html" with name="whatsapp" extra_class="fj-icon--solid" %}
+                        {% elif offer.application_method == 'physical' %}
+                            {% include "refonte/partials/icon.html" with name="folder" %}
+                        {% elif offer.application_method == 'email' %}
+                            {% include "refonte/partials/icon.html" with name="mail" %}
+                        {% elif offer.application_method == 'phone' %}
+                            {% include "refonte/partials/icon.html" with name="phone" %}
+                        {% else %}
+                            {% include "refonte/partials/icon.html" with name="send" %}
+                        {% endif %}
+                        {{ application_cta_label }}
+                    </a>
+                {% else %}
+                    <p class="fj-alert fj-alert--neutral">
+                        Les modalités de candidature ne sont pas renseignées.
+                    </p>
+                {% endif %}
+
+                {% if offer.application_email or offer.application_phone or offer.whatsapp_number or offer.application_url %}
+                    <div class="fj-apply-channels">
+                        <p class="fj-label">Coordonnées de candidature</p>
+                        {% if offer.application_email %}
+                            <a class="fj-apply-channel" href="mailto:{{ offer.application_email }}">
+                                {% include "refonte/partials/icon.html" with name="mail" extra_class="fj-icon--sm" %}
+                                <span>{{ offer.application_email }}</span>
+                            </a>
+                        {% endif %}
+                        {% if offer.application_phone %}
+                            <a class="fj-apply-channel" href="tel:{{ offer.application_phone }}">
+                                {% include "refonte/partials/icon.html" with name="phone" extra_class="fj-icon--sm" %}
+                                <span>{{ offer.application_phone }}</span>
+                            </a>
+                        {% endif %}
+                        {% if offer.whatsapp_number %}
+                            <a class="fj-apply-channel" href="{{ offer.whatsapp_url }}" target="_blank" rel="noopener noreferrer">
+                                {% include "refonte/partials/icon.html" with name="whatsapp" extra_class="fj-icon--sm fj-icon--solid" %}
+                                <span>{{ offer.whatsapp_number }}</span>
+                            </a>
+                        {% endif %}
+                        {% if offer.application_url %}
+                            <a class="fj-apply-channel" href="{{ offer.application_url }}" target="_blank" rel="noopener noreferrer">
+                                {% include "refonte/partials/icon.html" with name="external-link" extra_class="fj-icon--sm" %}
+                                <span>Formulaire ou annonce en ligne</span>
+                            </a>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            {% else %}
+                <div class="fj-alert fj-alert--neutral">
+                    Les candidatures sont fermées pour cette offre.
+                </div>
+                <a class="fj-btn fj-btn--secondary fj-btn--block" href="{% url 'catalogue' %}">
+                    Voir les offres ouvertes
+                    {% include "refonte/partials/icon.html" with name="arrow-right" extra_class="fj-icon--sm" %}
+                </a>
+            {% endif %}
+        </section>
+
+        <section class="fj-panel" aria-labelledby="advice-title">
+            <h2 class="fj-h3" id="advice-title">
+                {% include "refonte/partials/icon.html" with name="lightbulb" extra_class="fj-icon--sm fj-text-secondary" %}
+                Conseils candidats
+            </h2>
+            <p class="fj-small">
+                Personnalisez votre message en reprenant l’intitulé du poste et les
+                compétences demandées. Relisez les pièces demandées avant d’envoyer
+                votre dossier.
+            </p>
+            <a class="fj-link" href="{% url 'method' %}#controle-des-annonces">
+                {% include "refonte/partials/icon.html" with name="shield-check" extra_class="fj-icon--sm" %}
+                Comprendre notre méthode de vérification
+            </a>
+        </section>
+
+        <section class="fj-panel fj-report-card" aria-labelledby="report-title">
+            <h2 class="fj-h3" id="report-title">Un problème avec cette annonce ?</h2>
+            <p class="fj-small">
+                Offre expirée, information inexacte ou demande suspecte :
+                signalez-la à notre équipe.
+            </p>
+            <a class="fj-btn fj-btn--secondary fj-btn--block" href="{% url 'report_offer' offer.slug %}">
+                {% include "refonte/partials/icon.html" with name="flag" extra_class="fj-icon--sm" %}
+                Signaler cette offre
+            </a>
+        </section>
+    </aside>
+</div>
+
+{% if similar_offers %}
+    <section class="fj-container fj-detail-similar" aria-labelledby="similar-title">
+        <div class="fj-section-heading">
+            <div>
+                <p class="fj-eyebrow">À découvrir aussi</p>
+                <h2 class="fj-h2" id="similar-title">Offres similaires</h2>
+            </div>
+            <a class="fj-btn fj-btn--secondary" href="{% url 'catalogue' %}">Toutes les offres</a>
+        </div>
+        <div class="fj-detail-similar__grid">
+            {% for similar_offer in similar_offers %}
+                {% include "refonte/partials/offer_card.html" with offer=similar_offer %}
+            {% endfor %}
+        </div>
+    </section>
+{% endif %}
+
+{% if applications_open and application_cta_url %}
+    <div class="fj-detail-apply-bar">
+        <div class="fj-detail-apply-bar__copy">
+            <span class="fj-detail-apply-bar__label">{{ offer.application_channel_label }}</span>
+            <span class="fj-detail-apply-bar__title">{{ offer.title }}</span>
+        </div>
+        <a
+            class="fj-btn {% if application_cta_is_whatsapp %}fj-btn--whatsapp{% else %}fj-btn--solid{% endif %}"
+            href="{{ application_cta_url }}"
+            {% if application_cta_external %}target="_blank" rel="noopener noreferrer"{% endif %}
+        >
+            {{ application_cta_label }}
+        </a>
+    </div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/offer_detail.js' %}?v=20261109-1" defer></script>
+{% endblock %}

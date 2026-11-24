@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<main class="container section detail-page">
+    <p class="breadcrumbs"><a href="{% url 'catalogue' %}">Offres d’emploi</a> <span aria-hidden="true">›</span> {{ offer.title }}</p>
+
+    <header class="offer-detail-header detail-panel">
+        <p class="eyebrow">Fiche d’offre</p>
+        <h1>{{ offer.title }}</h1>
+        <p class="detail-company">{{ offer.company_name|default:"Employeur non précisé" }}</p>
+        <p class="application-channel"><strong>Mode de candidature :</strong> {{ offer.application_channel_label }}</p>
+        <div class="state-row" aria-label="États de vérification">
+            {% if offer.source %}
+                <span class="status-badge {% if offer.is_source_confirmed %}status-badge-success{% else %}status-badge-danger{% endif %}">
+                    {% if offer.is_source_confirmed %}Source vérifiée{% else %}Source non vérifiée{% endif %}
+                </span>
+            {% endif %}
+            <span class="status-badge {% if offer.is_employer_verified %}status-badge-success{% else %}status-badge-danger{% endif %}">
+                {{ offer.employer_verification_label }}
+            </span>
+            {% if offer.is_available %}
+                <span class="status-badge status-badge-success">Candidature ouverte</span>
+            {% else %}
+                <span class="status-badge status-badge-danger">Candidature fermée</span>
+            {% endif %}
+        </div>
+        <div class="offer-header-dates">
+            <p class="detail-publication-date">Date de publication : {% if offer.published_at %}{{ offer.published_at|date:"d/m/Y" }}{% else %}non précisée{% endif %}</p>
+            <p class="deadline-countdown">
+                {% if days_until_deadline is None %}
+                    Date de clôture non précisée
+                {% elif days_until_deadline > 0 %}
+                    {{ days_until_deadline }} jour{{ days_until_deadline|pluralize }} restant{{ days_until_deadline|pluralize }} avant la clôture
+                {% elif days_until_deadline == 0 %}
+                    Clôture aujourd’hui
+                {% else %}
+                    Date limite dépassée de {{ days_since_deadline }} jour{{ days_since_deadline|pluralize }}
+                {% endif %}
+            </p>
+        </div>
+    </header>
+
+    <div class="detail-layout">
+        <div class="detail-main-column">
+            <section class="detail-panel" aria-labelledby="essential-title">
+                <h2 id="essential-title">Informations essentielles</h2>
+                <dl class="essential-list">
+                    {% if offer.salary_min is not None or offer.salary_max is not None or offer.salary_note %}
+                    <div>
+                        <dt>Rémunération</dt>
+                        <dd>
+                            {% if offer.salary_min is not None %}{{ offer.salary_min|floatformat:"-2" }}{% endif %}
+                            {% if offer.salary_min is not None and offer.salary_max is not None %} – {% endif %}
+                            {% if offer.salary_max is not None %}{{ offer.salary_max|floatformat:"-2" }}{% endif %}
+                            {% if offer.salary_currency %} {{ offer.salary_currency }}{% endif %}
+                            {% if offer.salary_note %}{% if offer.salary_min is not None or offer.salary_max is not None %}<br>{% endif %}{{ offer.salary_note }}{% endif %}
+                        </dd>
+                    </div>
+                    {% endif %}
+                    {% if offer.location %}<div><dt>Lieu</dt><dd>{{ offer.location }}</dd></div>{% endif %}
+                    {% if offer.employment_type %}<div><dt>Type d’opportunité</dt><dd>{{ offer.employment_type }}</dd></div>{% endif %}
+                    {% if offer.experience_required %}<div><dt>Expérience</dt><dd>{{ offer.experience_required }}</dd></div>{% endif %}
+                    {% if offer.deadline or offer.deadline_time %}<div><dt>Date limite de candidature</dt><dd>{% if offer.deadline %}{{ offer.deadline|date:"d/m/Y" }}{% else %}Date non précisée{% endif %}{% if offer.deadline_time %} à {{ offer.deadline_time|time:"H:i" }}{% endif %}</dd></div>{% endif %}
+                    {% if offer.schedule %}<div><dt>Horaires</dt><dd>{{ offer.schedule }}</dd></div>{% endif %}
+                    {% if offer.salary_min is None and offer.salary_max is None and not offer.salary_note and not offer.location and not offer.employment_type and not offer.experience_required and not offer.deadline and not offer.deadline_time and not offer.schedule %}
+                        <p class="muted">Aucune autre information essentielle n’a été précisée.</p>
+                    {% endif %}
+                </dl>
+            </section>
+
+            <section class="detail-panel" aria-labelledby="description-title">
+                <h2 id="description-title">À propos du poste</h2>
+                {% if offer.description %}<div class="detail-body">{{ offer.description|linebreaks }}</div>{% else %}<p class="muted">La description du poste n’a pas été précisée.</p>{% endif %}
+            </section>
+        </div>
+
+        <aside class="detail-side-column">
+            <section class="detail-panel" id="application" aria-labelledby="application-title">
+                <h2 id="application-title">Candidature</h2>
+                {% if offer.application_instructions %}<p>{{ offer.application_instructions|linebreaksbr }}</p>{% endif %}
+                {% if offer.application_email %}<p><strong>E-mail :</strong> <a href="mailto:{{ offer.application_email }}">{{ offer.application_email }}</a></p>{% endif %}
+                {% if offer.application_phone %}<p><strong>Téléphone :</strong> <a href="tel:{{ offer.application_phone }}">{{ offer.application_phone }}</a></p>{% endif %}
+                {% if offer.whatsapp_number %}<p><strong>WhatsApp :</strong> {{ offer.whatsapp_number }}</p>{% endif %}
+                {% if offer.application_method == 'physical' %}
+                    <p>La candidature se fait par dépôt physique{% if offer.application_instructions %} : {{ offer.application_instructions|linebreaksbr }}{% else %}.{% endif %}</p>
+                {% elif not offer.application_url and not offer.application_email and not offer.application_phone and not offer.whatsapp_number and not offer.application_instructions %}
+                    <p class="muted">Les modalités de candidature ne sont pas renseignées.</p>
+                {% endif %}
+                {% if offer.required_documents %}
+                    <h3>Dossier de candidature à fournir</h3>
+                    <div class="required-documents">{{ offer.required_documents|linebreaks }}</div>
+                {% endif %}
+            </section>
+
+            <section class="detail-panel" aria-labelledby="source-title">
+                <h2 id="source-title">Source et vérifications</h2>
+                {% if offer.source %}
+                    <p class="source-name"><strong>Source :</strong> {{ offer.source.name }}</p>
+                    <p><span class="status-badge {% if offer.is_source_confirmed %}status-badge-success{% else %}status-badge-danger{% endif %}">{% if offer.is_source_confirmed %}Source vérifiée{% else %}Source non vérifiée{% endif %}</span></p>
+                    {% if offer.source.url %}<p><a href="{{ offer.source.url }}" target="_blank" rel="noopener noreferrer">Consulter la source originale</a></p>{% endif %}
+                {% endif %}
+                <p><span class="status-badge {% if offer.is_employer_verified %}status-badge-success{% else %}status-badge-danger{% endif %}">{{ offer.employer_verification_label }}</span></p>
+                <p class="detail-publication-date">Date de publication : {% if offer.published_at %}{{ offer.published_at|date:"d/m/Y" }}{% else %}non précisée{% endif %}</p>
+            </section>
+
+            <section class="detail-panel report-panel" aria-labelledby="report-title">
+                <h2 id="report-title">Un problème avec cette annonce ?</h2>
+                <p>Signalez une offre expirée, suspecte ou comportant une information inexacte.</p>
+                <a href="{% url 'report_offer' offer.slug %}">Signaler cette offre</a>
+            </section>
+        </aside>
+    </div>
+    {% if similar_offers %}
+        <section class="similar-offers-section" aria-labelledby="similar-offers-title">
+            <div class="similar-offers-heading">
+                <div>
+                    <p class="eyebrow">À découvrir également</p>
+                    <h2 id="similar-offers-title">Offres similaires</h2>
+                </div>
+                <a href="{% url 'catalogue' %}">Toutes les offres <span aria-hidden="true">→</span></a>
+            </div>
+            <div class="similar-offers-grid">
+                {% for similar_offer in similar_offers %}
+                    <article class="similar-offer-card">
+                        <div class="offer-meta-top">
+                            {% if similar_offer.is_source_confirmed %}<span class="status-badge status-badge-success">Source vérifiée</span>{% endif %}
+                            {% if similar_offer.is_employer_verified %}<span class="status-badge status-badge-success">{{ similar_offer.employer_verification_label }}</span>{% endif %}
+                        </div>
+                        <h3><a href="{% url 'offer_detail' similar_offer.slug %}">{{ similar_offer.title }}</a></h3>
+                        <p class="offer-company">{{ similar_offer.company_name|default:"Employeur non précisé" }}</p>
+                        <p class="offer-list-meta">
+                            {% if similar_offer.location %}<span>{{ similar_offer.location }}</span>{% endif %}
+                            {% if similar_offer.employment_type %}<span>{{ similar_offer.employment_type }}</span>{% endif %}
+                        </p>
+                        <a class="card-link" href="{% url 'offer_detail' similar_offer.slug %}">Voir l’offre <span aria-hidden="true">→</span></a>
+                    </article>
+                {% endfor %}
+            </div>
+        </section>
+    {% endif %}
+    {% if offer.application_action_url and offer.is_available %}
+        <a
+            class="floating-apply-button{% if offer.application_action_is_whatsapp %} floating-apply-whatsapp{% endif %}"
+            href="{{ offer.application_action_url }}"
+            {% if offer.application_action_is_whatsapp or offer.application_action_url|slice:":4" == 'http' %}target="_blank" rel="noopener noreferrer"{% endif %}
+        >{{ offer.application_action_label }}</a>
+    {% endif %}
+</main>
+{% endblock %}

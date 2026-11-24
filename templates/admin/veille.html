@@ -1,0 +1,587 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block title %}{{ title }} | Faso Job — Administration{% endblock %}
+
+{% block bodyclass %}{{ block.super }} editorial-dashboard veille{% endblock %}
+
+{% block content_title %}{% endblock %}
+{% block content_subtitle %}{% endblock %}
+
+{% block content %}
+<div class="dashboard-main">
+        <div class="dashboard-page-heading">
+            <div>
+                <p class="dashboard-eyebrow">Veille automatisée</p>
+                <h1>Centre de veille</h1>
+                <p>
+                    Les annonces trouvées sur les sources surveillées sont déposées ici.
+                    Rien n’est publié automatiquement : chaque annonce attend une
+                    décision de l’équipe.
+                </p>
+            </div>
+            <div class="dashboard-heading-actions">
+                <a class="dashboard-secondary-action" href="{% url 'admin:offres_offer_changelist' %}">
+                    Voir les offres
+                </a>
+                <a class="dashboard-secondary-action" href="{% url 'admin:index' %}">
+                    Retour au tableau de bord
+                </a>
+            </div>
+        </div>
+
+        {% if not ai_configured %}
+            <div class="dashboard-alert">
+                <span class="dashboard-alert__icon" aria-hidden="true">!</span>
+                <span class="dashboard-alert__body">
+                    <strong>Aucun service d’intelligence artificielle configuré</strong>
+                    <span>
+                        Les annonces sont conservées, mais sans analyse réussie aucun
+                        brouillon incomplet n’est créé. Elles restent dans « Annonces
+                        détectées » avec le motif de l’échec.
+                        Renseignez AI_BASE_URL, AI_API_KEY et AI_MODEL dans le
+                        fichier <code>.env</code> pour activer l’analyse.
+                    </span>
+                </span>
+            </div>
+        {% else %}
+            <div class="dashboard-alert dashboard-alert--calm">
+                <span class="dashboard-alert__icon" aria-hidden="true">✓</span>
+                <span class="dashboard-alert__body">
+                    <strong>Service d’analyse configuré</strong>
+                    <span>
+                        Les annonces sont envoyées à <code>{{ ai_provider }}</code>
+                        ({{ ai_model }}). Si l’extraction échoue ou ne fournit qu’un
+                        intitulé, aucun brouillon incomplet n’est créé ; l’erreur reste
+                        visible dans « Annonces détectées ».
+                    </span>
+                </span>
+            </div>
+        {% endif %}
+
+        <section class="dashboard-section" aria-labelledby="counters-title">
+            <div class="dashboard-section-heading">
+                <h2 id="counters-title">État de la veille</h2>
+                <span>Ce qui attend votre examen.</span>
+            </div>
+            <ul class="dashboard-feed">
+                <li class="dashboard-feed__item">
+                    <span class="dashboard-feed__dot" aria-hidden="true"></span>
+                    <div>
+                        <strong>{{ compteurs.a_verifier }} annonce(s) à vérifier</strong>
+                        <p>Des brouillons sont créés : ouvrez-les dans la liste des offres pour les corriger, les valider ou les rejeter.</p>
+                    </div>
+                </li>
+                <li class="dashboard-feed__item">
+                    <span class="dashboard-feed__dot" aria-hidden="true"></span>
+                    <div>
+                        <strong>{{ compteurs.doublons }} doublon(s) potentiel(s)</strong>
+                        <p>Des annonces ressemblent à une offre déjà connue. Confirmez ou écartez : rien n’est supprimé automatiquement.</p>
+                    </div>
+                </li>
+                <li class="dashboard-feed__item">
+                    <span class="dashboard-feed__dot dashboard-feed__dot--danger" aria-hidden="true"></span>
+                    <div>
+                        <strong>{{ compteurs.detectees }} annonce(s) détectée(s)</strong>
+                        <p>Trouvées mais pas encore analysées : l’analyse automatique a échoué, ou la collecte est en cours.</p>
+                    </div>
+                </li>
+                <li class="dashboard-feed__item">
+                    <span class="dashboard-feed__dot" aria-hidden="true"></span>
+                    <div>
+                        <strong>{{ compteurs.surveillées }} source(s) surveillée(s)</strong>
+                        <p>{{ compteurs.collectes }} passage(s) de collecte enregistré(s), {{ compteurs.rejetees }} annonce(s) rejetée(s).</p>
+                    </div>
+                </li>
+            </ul>
+        </section>
+
+        <section class="dashboard-section" aria-labelledby="collect-title">
+            <div class="dashboard-section-heading">
+                <h2 id="collect-title">Collecter maintenant</h2>
+                <span>Une source surveillée, un lien ou un texte collé.</span>
+            </div>
+
+            <form method="post" class="veille-collect-form">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="collect_source">
+
+                <div class="form-row">
+                    <label for="id_collect_source">Source surveillée :</label>
+                    <select name="source_id" id="id_collect_source">
+                        <option value="">— Choisir une source —</option>
+                        {% for source in sources_surveillees %}
+                            <option value="{{ source.pk }}">{{ source.name }}{% if not source.is_watchable %} (non autorisée){% endif %}</option>
+                        {% endfor %}
+                    </select>
+                    <p class="help">Seules les sources autorisées et automatisables sont collectées.</p>
+                </div>
+
+                <div class="submit-row">
+                    <input type="submit" value="Collecter cette source">
+                </div>
+            </form>
+
+            <form method="post" class="veille-collect-form">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="collect_url">
+
+                <div class="form-row">
+                    <label for="id_url">Lien d’une annonce :</label>
+                    <input type="text" name="url" id="id_url"
+                           placeholder="https://…">
+                    <p class="help">La page est lue, l’annonce est analysée, un brouillon est préparé.</p>
+                </div>
+
+                <div class="form-row">
+                    <label for="id_url_source">Rattacher à la source :</label>
+                    <select name="source_id" id="id_url_source">
+                        <option value="">Saisie manuelle — lien</option>
+                        {% for source in sources %}
+                            <option value="{{ source.pk }}">{{ source.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="submit-row">
+                    <input type="submit" value="Analyser ce lien">
+                </div>
+            </form>
+
+            <form method="post" class="veille-collect-form">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="collect_text">
+
+                <div class="form-row">
+                    <label for="id_text">Texte d’une annonce :</label>
+                    <textarea name="text" id="id_text" rows="6"
+                              placeholder="Collez ici le texte de l’annonce, par exemple celui d’un groupe WhatsApp ou d’une page Facebook."></textarea>
+                    <p class="help">Utilisé pour les annonces trouvées sur les réseaux sociaux : elles sont saisies, pas récupérées automatiquement.</p>
+                </div>
+
+                <div class="form-row">
+                    <label for="id_text_source">Rattacher à la source :</label>
+                    <select name="source_id" id="id_text_source">
+                        <option value="">Saisie manuelle — texte</option>
+                        {% for source in sources %}
+                            <option value="{{ source.pk }}">{{ source.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="submit-row">
+                    <input type="submit" value="Analyser ce texte">
+                </div>
+            </form>
+        </section>
+
+        <div class="dashboard-columns">
+            <section class="dashboard-section" aria-labelledby="verify-title">
+                <div class="dashboard-section-heading">
+                    <h2 id="verify-title">Annonces à vérifier</h2>
+                    <span>Brouillons en attente de votre décision.</span>
+                </div>
+                {% if annonces_a_verifier %}
+                    <ul class="dashboard-feed">
+                        {% for annonce in annonces_a_verifier %}
+                            <li class="dashboard-feed__item">
+                                <span class="dashboard-feed__dot" aria-hidden="true"></span>
+                                <div>
+                                    <strong>{{ annonce.offer.title }}</strong>
+                                    <p class="dashboard-feed__meta">
+                                        {{ annonce.source_name }} — collectée le {{ annonce.collected_at|date:"d/m/Y à H:i" }}
+                                        {% if annonce.duplicate_status != "none" %} · doublon signalé{% endif %}
+                                    </p>
+                                    <p>
+                                        <a href="{% url 'admin:offres_offer_change' annonce.offer.pk %}">
+                                            Ouvrir le brouillon
+                                        </a>
+                                    </p>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="empty">Aucune annonce à vérifier pour le moment.</p>
+                {% endif %}
+            </section>
+
+            <section class="dashboard-section" aria-labelledby="duplicate-title">
+                <div class="dashboard-section-heading">
+                    <h2 id="duplicate-title">Doublons potentiels</h2>
+                    <span>À confirmer ou à écarter. Rien n’est supprimé.</span>
+                </div>
+                {% if doublons %}
+                    <ul class="dashboard-feed">
+                        {% for annonce in doublons %}
+                            <li class="dashboard-feed__item">
+                                <span class="dashboard-feed__dot dashboard-feed__dot--danger" aria-hidden="true"></span>
+                                <div>
+                                    <strong>{{ annonce.get_duplicate_status_display }}</strong>
+                                    <p class="dashboard-feed__meta">{{ annonce.duplicate_reasons }}</p>
+                                    <p>
+                                        {% if annonce.duplicate_of %}
+                                            <a href="{% url 'admin:offres_offer_change' annonce.duplicate_of.pk %}">
+                                                Voir l’offre proche
+                                            </a>
+                                        {% endif %}
+                                    </p>
+                                    <p class="veille-actions">
+                                        {% if annonce.duplicate_status == "suspected" %}
+                                            <form method="post" class="veille-action-form">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="action" value="confirm_duplicate">
+                                                <input type="hidden" name="announcement_id" value="{{ annonce.pk }}">
+                                                <input type="submit" value="Confirmer le doublon">
+                                            </form>
+                                            <form method="post" class="veille-action-form">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="action" value="dismiss_duplicate">
+                                                <input type="hidden" name="announcement_id" value="{{ annonce.pk }}">
+                                                <input type="submit" value="Écarter">
+                                            </form>
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="empty">Aucun doublon potentiel signalé.</p>
+                {% endif %}
+            </section>
+        </div>
+
+        <div class="dashboard-columns">
+            <section class="dashboard-section" aria-labelledby="detected-title">
+                <div class="dashboard-section-heading">
+                    <h2 id="detected-title">Annonces détectées</h2>
+                    <span>Trouvées, pas encore analysées.</span>
+                </div>
+                {% if annonces_detectees %}
+                    <ul class="dashboard-feed">
+                        {% for annonce in annonces_detectees %}
+                            <li class="dashboard-feed__item">
+                                <span class="dashboard-feed__dot" aria-hidden="true"></span>
+                                <div>
+                                    <strong>{{ annonce.source_name }}</strong>
+                                    <p class="dashboard-feed__meta">
+                                        {% if annonce.source_url %}
+                                            <a href="{{ annonce.source_url }}" rel="noopener nofollow" target="_blank">Voir la source</a> —
+                                        {% endif %}
+                                        {{ annonce.collected_at|date:"d/m/Y à H:i" }}
+                                    </p>
+                                    {% if annonce.error_message %}
+                                        <p>{{ annonce.error_message }}</p>
+                                    {% endif %}
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="empty">Aucune annonce en attente d’analyse.</p>
+                {% endif %}
+            </section>
+
+            <section class="dashboard-section" aria-labelledby="rejected-title">
+                <div class="dashboard-section-heading">
+                    <h2 id="rejected-title">Annonces rejetées</h2>
+                    <span>Refusées par l’équipe.</span>
+                </div>
+                {% if rejetees %}
+                    <ul class="dashboard-feed">
+                        {% for annonce in rejetees %}
+                            <li class="dashboard-feed__item">
+                                <span class="dashboard-feed__dot dashboard-feed__dot--danger" aria-hidden="true"></span>
+                                <div>
+                                    <strong>{{ annonce.source_name }}</strong>
+                                    <p class="dashboard-feed__meta">
+                                        Rejetée le {{ annonce.reviewed_at|date:"d/m/Y à H:i" }}
+                                    </p>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="empty">Aucune annonce rejetée.</p>
+                {% endif %}
+            </section>
+        </div>
+
+        <section class="dashboard-section" aria-labelledby="discovery-title">
+            <div class="dashboard-section-heading">
+                <h2 id="discovery-title">Sources proposées par l’assistant</h2>
+                <span>
+                    L’assistant cherche et vérifie ; vous décidez.
+                    {% if moteur_recherche %}
+                        Moteur de recherche actif : {{ moteur_recherche }}.
+                    {% else %}
+                        Aucun moteur de recherche configuré : seules les adresses
+                        connues du modèle sont proposées.
+                    {% endif %}
+                </span>
+            </div>
+
+            <form method="post" class="veille-collect-form">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="discover_sources">
+
+                <div class="form-row">
+                    <label for="id_demande">Que doit chercher l’assistant ?</label>
+                    <input type="text" name="demande" id="id_demande"
+                           value="offres d’emploi au Burkina Faso"
+                           maxlength="200">
+                    <p class="help">
+                        Ex. : « offres d’emploi pour des ONG au Burkina Faso ».
+                        L’assistant propose des adresses, il ne visite pas les sites
+                        lui-même : c’est le code qui les vérifie.
+                    </p>
+                </div>
+
+                <div class="form-row">
+                    <label for="id_maximum">Nombre d’adresses à vérifier :</label>
+                    <input type="number" name="maximum" id="id_maximum" value="8"
+                           min="1" max="8">
+                    <p class="help">
+                        Chaque adresse vérifiée respecte un délai de dix
+                        secondes : prévoyez huit adresses pour environ une minute
+                        et demie.
+                    </p>
+                </div>
+
+                <div class="submit-row">
+                    <input type="submit" value="Chercher des sources">
+                </div>
+            </form>
+
+            {% if propositions %}
+                <div class="veille-propositions">
+                    {% for proposition in propositions %}
+                        <article class="veille-proposition">
+                            <header class="veille-proposition__header">
+                                <h3>{{ proposition.name|default:proposition.url }}</h3>
+                                <p class="veille-proposition__url">
+                                    <a href="{{ proposition.url }}" rel="noopener nofollow"
+                                       target="_blank">{{ proposition.url }}</a>
+                                </p>
+                            </header>
+
+                            <dl class="veille-proposition__facts">
+                                <div>
+                                    <dt>Verdict</dt>
+                                    <dd>{{ proposition.get_verdict_display }}</dd>
+                                </div>
+                                {% if proposition.kind %}
+                                    <div>
+                                        <dt>Type de site</dt>
+                                        <dd>{{ proposition.kind }}</dd>
+                                    </div>
+                                {% endif %}
+                                <div>
+                                    <dt>Score</dt>
+                                    <dd>{{ proposition.score|floatformat:0 }}&#8239;%</dd>
+                                </div>
+                                {% if proposition.selector %}
+                                    <div>
+                                        <dt>Sélecteur</dt>
+                                        <dd><code>{{ proposition.selector }}</code>
+                                            ({{ proposition.blocks_count }} annonce{{ proposition.blocks_count|pluralize }})</dd>
+                                    </div>
+                                {% endif %}
+                                <div>
+                                    <dt>Proposée par</dt>
+                                    <dd>{{ proposition.origin|default:"modèle" }}</dd>
+                                </div>
+                            </dl>
+
+                            {% if proposition.reasons %}
+                                <p class="veille-proposition__reasons">{{ proposition.reasons|linebreaksbr }}</p>
+                            {% endif %}
+
+                            {% if proposition.conditions_quote %}
+                                <p class="veille-proposition__citation">
+                                    <strong>Conditions relevées :</strong>
+                                    {{ proposition.conditions_quote }}
+                                </p>
+                            {% endif %}
+
+                            {% if proposition.sample %}
+                                <details class="veille-proposition__sample">
+                                    <summary>Voir un échantillon</summary>
+                                    <p>{{ proposition.sample }}</p>
+                                </details>
+                            {% endif %}
+
+                            <form method="post" class="veille-proposition__action">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="accept_proposal">
+                                <input type="hidden" name="proposal_id" value="{{ proposition.pk }}">
+
+                                <div class="form-row">
+                                    <label for="id_note_{{ proposition.pk }}">
+                                        Note d’autorisation :
+                                    </label>
+                                    <textarea name="authorization_note"
+                                              id="id_note_{{ proposition.pk }}"
+                                              rows="2">{{ proposition.default_authorization_note }}</textarea>
+                                    <p class="help">
+                                        {% if proposition.needs_motivation %}
+                                            <strong>Reprise non établie par le site.</strong>
+                                            Expliquez ici pourquoi vous autorisez
+                                            cette source : c’est votre signature.
+                                        {% else %}
+                                            Le site autorise explicitement la reprise.
+                                            Vous pouvez reformuler la note.
+                                        {% endif %}
+                                    </p>
+                                </div>
+
+                                <div class="submit-row">
+                                    <input type="submit" value="Autoriser cette source">
+                                </div>
+                            </form>
+
+                            <form method="post" class="veille-proposition__action veille-proposition__action--refuse">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="refuse_proposal">
+                                <input type="hidden" name="proposal_id" value="{{ proposition.pk }}">
+                                <div class="submit-row">
+                                    <input type="submit" value="Refuser">
+                                </div>
+                            </form>
+                        </article>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="empty">
+                    Aucune proposition en attente.
+                    {% if propositions_refusees %}
+                        ({{ propositions_refusees }} source{{ propositions_refusees|pluralize }} refusée{{ propositions_refusees|pluralize }} jusqu’ici.)
+                    {% endif %}
+                </p>
+            {% endif %}
+        </section>
+
+        <section class="dashboard-section" aria-labelledby="sources-title">
+            <div class="dashboard-section-heading">
+                <h2 id="sources-title">Sources surveillées</h2>
+                <span>Une source n’est surveillée qu’avec une autorisation écrite.</span>
+            </div>
+            {% if sources_surveillees %}
+                <div class="recent-offers-wrap">
+                    <table class="recent-offers activity-table">
+                        <thead>
+                            <tr>
+                                <th>Source</th>
+                                <th>Mode de collecte</th>
+                                <th>Autorisation</th>
+                                <th>Dernière collecte</th>
+                                <th>Résultat</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for source in sources_surveillees %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'admin:offres_source_change' source.pk %}">{{ source.name }}</a>
+                                </td>
+                                <td>{{ source.get_collection_method_display|default:"—" }}</td>
+                                <td>
+                                    {% if source.authorization_note %}
+                                        {{ source.authorization_note|truncatechars:60 }}
+                                    {% else %}
+                                        <em>Autorisation manquante</em>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if source.last_collected_at %}
+                                        {{ source.last_collected_at|date:"d/m/Y à H:i" }}
+                                    {% else %}
+                                        —
+                                    {% endif %}
+                                </td>
+                                <td>{{ source.last_status|default:"—" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="empty">Aucune source surveillée pour le moment.</p>
+            {% endif %}
+        </section>
+
+        <section class="dashboard-section" aria-labelledby="runs-title">
+            <div class="dashboard-section-heading">
+                <h2 id="runs-title">Historique des collectes</h2>
+                <span>Les vingt derniers passages.</span>
+            </div>
+            {% if runs %}
+                <div class="recent-offers-wrap">
+                    <table class="recent-offers activity-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Source</th>
+                                <th>Déclenchement</th>
+                                <th>Résultat</th>
+                                <th>Trouvées</th>
+                                <th>Brouillons</th>
+                                <th>Doublons</th>
+                                <th>Erreurs</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for run in runs %}
+                            <tr>
+                                <td>{{ run.started_at|date:"d/m/Y H:i" }}</td>
+                                <td>{{ run.source.name|default:"—" }}</td>
+                                <td>{{ run.get_triggered_by_display }}</td>
+                                <td>{{ run.get_status_display }}</td>
+                                <td>{{ run.found_count }}</td>
+                                <td>{{ run.created_count }}</td>
+                                <td>{{ run.duplicate_count }}</td>
+                                <td>{{ run.error_count }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="empty">Aucun passage de collecte enregistré.</p>
+            {% endif %}
+        </section>
+
+        <section class="dashboard-section" aria-labelledby="planning-title">
+            <div class="dashboard-section-heading">
+                <h2 id="planning-title">Activer la collecte automatique</h2>
+                <span>Une seule étape, à faire sur le serveur qui héberge le site.</span>
+            </div>
+
+            <div class="backup-activation">
+                <p>
+                    La collecte automatique est prévue <strong>{{ instructions.schedule_text }}</strong>.
+                    Copiez la commande ci-dessous dans la tâche planifiée de votre serveur.
+                </p>
+
+                <h3>Sous Linux (cron)</h3>
+                <pre class="backup-code"><code>{{ instructions.cron_command }}</code></pre>
+
+                <h3>Sous Windows (Tâche planifiée)</h3>
+                <pre class="backup-code"><code>{{ instructions.schtasks_command }}</code></pre>
+            </div>
+        </section>
+
+        <aside class="dashboard-help">
+            <span class="dashboard-help-icon" aria-hidden="true">i</span>
+            <p>
+                <strong>Rien n’est publié automatiquement.</strong>
+                Un brouillon est créé uniquement après une extraction suffisamment
+                complète. En cas d’échec, l’annonce reste dans « Annonces détectées ».
+                Pour publier un brouillon, ouvrez-le dans la liste des offres,
+                complétez-le, cochez « source vérifiée » puis validez-le comme les
+                autres offres.
+            </p>
+        </aside>
+    </div>
+{% endblock %}

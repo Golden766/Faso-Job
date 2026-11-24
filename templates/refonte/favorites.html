@@ -1,0 +1,43 @@
+{% extends "refonte/base.html" %}
+
+{% block title %}Mes favoris — Faso Job{% endblock %}
+{% block meta_description %}Retrouvez les offres que vous avez enregistrées dans ce navigateur.{% endblock %}
+
+{% block content %}
+<section class="fj-page-head">
+    <div class="fj-container">
+        <nav class="fj-breadcrumb" aria-label="Fil d’Ariane">
+            <a href="{% url 'home' %}">Accueil</a>
+            <span class="fj-breadcrumb__separator" aria-hidden="true">/</span>
+            <span aria-current="page">Mes favoris</span>
+        </nav>
+        <div class="fj-page-head__copy">
+            <p class="fj-eyebrow">Votre sélection</p>
+            <h1 class="fj-h1">Mes favoris</h1>
+            <p class="fj-body">
+                Les offres enregistrées sont conservées dans ce navigateur, sans compte.
+            </p>
+        </div>
+    </div>
+</section>
+
+<section class="fj-container fj-favorites-page" aria-label="Offres enregistrées">
+    <p class="fj-small" data-favorites-noscript>
+        Activez JavaScript pour consulter les offres enregistrées dans ce navigateur.
+    </p>
+    <p class="fj-alert fj-alert--danger" data-favorites-error role="alert" hidden>
+        Impossible de lire vos favoris dans le stockage de ce navigateur. Vos données n’ont pas été modifiées.
+    </p>
+    <ul class="fj-favorites-list" data-favorites-list aria-live="polite" hidden></ul>
+    <div class="fj-empty fj-favorites-empty" data-favorites-empty hidden>
+        <span class="fj-empty__icon">
+            {% include "refonte/partials/icon.html" with name="heart" extra_class="fj-icon--lg" %}
+        </span>
+        <p class="fj-h3">Aucune offre enregistrée pour le moment</p>
+        <p class="fj-small">
+            Ajoutez une offre à vos favoris depuis une carte ou sa fiche pour la retrouver ici.
+        </p>
+        <a class="fj-btn fj-btn--primary" href="{% url 'catalogue' %}">Parcourir les offres</a>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Plateforme d'opportunités professionnelles{% endblock %}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}?v=20261022-3">
+    <script src="{% static 'js/catalogue.js' %}?v=20261022-2" defer></script>
+</head>
+<body>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a class="brand" href="{% url 'home' %}" aria-label="Accueil, Plateforme emploi">
+                <span>OPPORTUNITÉS</span>
+            </a>
+            <nav class="main-nav desktop-nav" aria-label="Navigation principale">
+                <a href="{% url 'home' %}">Offres d’emploi</a>
+                <a href="{% url 'submit_offer' %}">Proposer une offre</a>
+            </nav>
+            <a class="header-cta" href="{% url 'submit_offer' %}">Proposer une offre</a>
+            <details class="mobile-menu">
+                <summary aria-label="Ouvrir le menu de navigation"><span aria-hidden="true">☰</span></summary>
+                <nav aria-label="Navigation mobile">
+                    <a href="{% url 'home' %}">Offres d’emploi</a>
+                    <a href="{% url 'submit_offer' %}">Proposer une offre</a>
+                </nav>
+            </details>
+        </div>
+    </header>
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+    <footer class="site-footer">
+        <div class="container footer-inner">
+            <a class="brand footer-brand" href="{% url 'home' %}">
+                <span>OPPORTUNITÉS</span>
+            </a>
+            <p>Des opportunités claires, vérifiées et accessibles.</p>
+            <a href="{% url 'catalogue' %}">Parcourir les offres <span aria-hidden="true">→</span></a>
+        </div>
+    </footer>
+</body>
+</html>

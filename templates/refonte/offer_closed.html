@@ -1,0 +1,58 @@
+{% extends "refonte/base.html" %}
+{% load static %}
+
+{% block title %}Offre close - Faso Job{% endblock %}
+{% block meta_description %}Cette offre d'emploi n'est plus disponible sur Faso Job : sa date limite de candidature est dépassée. Consultez les offres encore ouvertes au Burkina Faso.{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/refonte/detail.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="fj-page-head">
+    <div class="fj-container">
+        <nav class="fj-breadcrumb" aria-label="Fil d'Ariane">
+            <a href="{% url 'home' %}">Accueil</a>
+            <span class="fj-breadcrumb__separator" aria-hidden="true">/</span>
+            <a href="{% url 'catalogue' %}">Offres</a>
+            <span class="fj-breadcrumb__separator" aria-hidden="true">/</span>
+            <span aria-current="page">Offre close</span>
+        </nav>
+
+        <div class="fj-page-head__row">
+            <div class="fj-page-head__copy">
+                <p class="fj-eyebrow">Annonce retirée du catalogue</p>
+                <h1 class="fj-h1">Cette offre n’est plus disponible</h1>
+                <p class="fj-body">
+                    La date limite de candidature de cette annonce est dépassée.
+                    Elle n’est plus présentée comme une opportunité active et les
+                    candidatures sont closes.
+                </p>
+            </div>
+            <a class="fj-btn fj-btn--primary" href="{% url 'catalogue' %}">
+                {% include "refonte/partials/icon.html" with name="arrow-right" extra_class="fj-icon--sm" %}
+                Voir les offres ouvertes
+            </a>
+        </div>
+    </div>
+</section>
+
+<div class="fj-container fj-section">
+    <div class="fj-panel">
+        <div class="fj-alert fj-alert--neutral">
+            {% include "refonte/partials/icon.html" with name="info" extra_class="fj-icon--sm" %}
+            <span>
+                Faso Job retire du catalogue public les offres dont la date limite
+                est dépassée, pour ne présenter que des postes encore ouverts.
+                L’équipe conserve ces annonces pour son suivi interne.
+            </span>
+        </div>
+        <p>
+            <a class="fj-btn fj-btn--secondary" href="{% url 'submit_offer' %}">
+                {% include "refonte/partials/icon.html" with name="plus" %}
+                Proposer une annonce
+            </a>
+        </p>
+    </div>
+</div>
+{% endblock %}

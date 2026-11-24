@@ -1,0 +1,247 @@
+{% extends "refonte/base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+{% block meta_description %}Trouvez des offres d’emploi, stages et missions au Burkina Faso sur Faso Job : annonces tracées, sources vérifiées et candidature directe.{% endblock %}
+
+{% block content %}
+<section class="fj-hero">
+    <div class="fj-container fj-hero__inner">
+        <div class="fj-hero__copy">
+            <p class="fj-hero__badge">
+                {% include "refonte/partials/icon.html" with name="shield-check" extra_class="fj-icon--sm" %}
+                Accès libre, transparent et sans intermédiaire
+            </p>
+            <h1 class="fj-display fj-hero__title">
+                Les opportunités professionnelles, au même endroit.
+            </h1>
+            <p class="fj-lead fj-hero__lead">
+                Emplois, stages et missions au Burkina Faso, avec leur source et leurs
+                modalités de candidature clairement indiquées.
+            </p>
+
+            <form class="fj-search" action="{% url 'catalogue' %}" method="get" role="search">
+                <div class="fj-search__field">
+                    <label class="fj-sr-only" for="search-keyword">Quel poste ou métier recherchez-vous ?</label>
+                    {% include "refonte/partials/icon.html" with name="search" extra_class="fj-search__icon" %}
+                    <input
+                        class="fj-input fj-search__control"
+                        id="search-keyword"
+                        name="q"
+                        type="search"
+                        placeholder="Quel poste ou métier recherchez-vous ?"
+                        autocomplete="off"
+                    >
+                </div>
+                <div class="fj-search__field">
+                    <label class="fj-sr-only" for="search-location">Localisation au Burkina Faso</label>
+                    {% include "refonte/partials/icon.html" with name="map-pin" extra_class="fj-search__icon" %}
+                    <select class="fj-select fj-search__control" id="search-location" name="location">
+                        <option value="">Toutes les villes</option>
+                        {% for location in locations %}
+                            <option value="{{ location }}">{{ location }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button class="fj-btn fj-btn--primary fj-btn--lg fj-search__submit" type="submit">
+                    {% include "refonte/partials/icon.html" with name="search" %}
+                    <span class="fj-btn__label">Rechercher</span>
+                </button>
+            </form>
+
+            <p class="fj-small fj-hero__count">
+                {% if offer_count %}
+                    {{ offer_count }} annonce{{ offer_count|pluralize }} publiée{{ offer_count|pluralize }}.
+                {% else %}
+                    Le catalogue s’enrichit au fil des vérifications.
+                {% endif %}
+            </p>
+        </div>
+    </div>
+</section>
+
+{% if opportunity_types %}
+<section class="fj-section" aria-labelledby="types-title">
+    <div class="fj-container">
+        <div class="fj-section-heading">
+            <div>
+                <p class="fj-eyebrow">Explorer</p>
+                <h2 class="fj-h2" id="types-title">Explorer par type d’opportunité</h2>
+            </div>
+            <a class="fj-btn fj-btn--ghost" href="{% url 'catalogue' %}">
+                Tout le catalogue
+                {% include "refonte/partials/icon.html" with name="arrow-right" %}
+            </a>
+        </div>
+
+        <div class="fj-type-grid">
+            {% for opportunity_type in opportunity_types %}
+                <a class="fj-type-card" href="{% url 'catalogue' %}?type={{ opportunity_type.employment_type|urlencode }}">
+                    <span class="fj-type-card__icon">
+                        {% if 'stage' in opportunity_type.employment_type|lower %}
+                            {% include "refonte/partials/icon.html" with name="graduation" %}
+                        {% elif 'mission' in opportunity_type.employment_type|lower or 'prestation' in opportunity_type.employment_type|lower %}
+                            {% include "refonte/partials/icon.html" with name="file-text" %}
+                        {% elif 'distance' in opportunity_type.employment_type|lower or 'remote' in opportunity_type.employment_type|lower or 'télétravail' in opportunity_type.employment_type|lower %}
+                            {% include "refonte/partials/icon.html" with name="globe" %}
+                        {% else %}
+                            {% include "refonte/partials/icon.html" with name="briefcase" %}
+                        {% endif %}
+                    </span>
+                    <span class="fj-type-card__body">
+                        <span class="fj-type-card__title">{{ opportunity_type.employment_type }}</span>
+                        <span class="fj-type-card__meta">
+                            {{ opportunity_type.offer_count }} offre{{ opportunity_type.offer_count|pluralize }}
+                        </span>
+                    </span>
+                    {% include "refonte/partials/icon.html" with name="chevron-right" extra_class="fj-type-card__chevron" %}
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<section class="fj-section" aria-labelledby="latest-title">
+    <div class="fj-container">
+        <div class="fj-section-heading">
+            <div>
+                <p class="fj-eyebrow">Mises à jour récentes</p>
+                <h2 class="fj-h2" id="latest-title">Dernières opportunités publiées</h2>
+                <p class="fj-small">
+                    Annonces publiées après vérification de leur source et de leurs
+                    modalités de candidature.
+                </p>
+            </div>
+            <a class="fj-btn fj-btn--ghost" href="{% url 'catalogue' %}">
+                Voir toutes les opportunités
+                {% include "refonte/partials/icon.html" with name="arrow-right" %}
+            </a>
+        </div>
+
+        {% if latest_offers %}
+            <div class="fj-offer-grid" data-offers-list>
+                {% for offer in latest_offers %}
+                    {% include "refonte/partials/offer_card.html" with offer=offer %}
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="fj-empty">
+                <span class="fj-empty__icon">
+                    {% include "refonte/partials/icon.html" with name="briefcase" extra_class="fj-icon--lg" %}
+                </span>
+                <p class="fj-h3">Aucune offre n’est publiée pour le moment</p>
+                <p class="fj-small">
+                    Les annonces apparaissent ici après vérification. Vous pouvez
+                    proposer une opportunité pour accélérer la mise en ligne.
+                </p>
+                <a class="fj-btn fj-btn--primary" href="{% url 'submit_offer' %}">Proposer une annonce</a>
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+<section class="fj-section fj-section--canvas" id="parcours" aria-labelledby="parcours-title">
+    <div class="fj-container">
+        <div class="fj-section-heading">
+            <div>
+                <p class="fj-eyebrow">Simple et direct</p>
+                <h2 class="fj-h2" id="parcours-title">Un parcours sans création de compte</h2>
+                <p class="fj-small">
+                    Consultez les annonces librement, puis contactez l’employeur par le
+                    canal officiel indiqué sur la fiche.
+                </p>
+            </div>
+        </div>
+
+        <ol class="fj-steps">
+            <li class="fj-step">
+                <span class="fj-step__number" aria-hidden="true">1</span>
+                <span class="fj-step__icon">
+                    {% include "refonte/partials/icon.html" with name="search" %}
+                </span>
+                <h3 class="fj-step__title">Recherchez une opportunité</h3>
+                <p class="fj-small">
+                    Filtrez par métier, mot-clé, type de contrat ou ville selon votre
+                    situation.
+                </p>
+            </li>
+            <li class="fj-step">
+                <span class="fj-step__number" aria-hidden="true">2</span>
+                <span class="fj-step__icon">
+                    {% include "refonte/partials/icon.html" with name="shield-check" %}
+                </span>
+                <h3 class="fj-step__title">Vérifiez les informations et la source</h3>
+                <p class="fj-small">
+                    Consultez les informations essentielles, le dossier demandé et le
+                    niveau de vérification affiché sur l’annonce.
+                </p>
+            </li>
+            <li class="fj-step">
+                <span class="fj-step__number" aria-hidden="true">3</span>
+                <span class="fj-step__icon">
+                    {% include "refonte/partials/icon.html" with name="send" %}
+                </span>
+                <h3 class="fj-step__title">Suivez les instructions de candidature</h3>
+                <p class="fj-small">
+                    Postulez par WhatsApp, e-mail, téléphone, en ligne ou en personne,
+                    selon ce qui est indiqué par l’employeur.
+                </p>
+            </li>
+        </ol>
+    </div>
+</section>
+
+<section class="fj-section" id="transparence" aria-labelledby="transparence-title">
+    <div class="fj-container">
+        <div class="fj-trust">
+            <div class="fj-trust__main">
+                <span class="fj-trust__icon">
+                    {% include "refonte/partials/icon.html" with name="shield-check" extra_class="fj-icon--lg" %}
+                </span>
+                <div>
+                    <p class="fj-eyebrow">Notre engagement</p>
+                    <h2 class="fj-h2" id="transparence-title">Une transparence vérifiable</h2>
+                    <p class="fj-body">
+                        Nous centralisons les opportunités pour faciliter la recherche.
+                        La source des annonces et les vérifications réalisées sont
+                        indiquées lorsqu’elles sont disponibles. Prenez toujours
+                        connaissance des conditions de candidature avant de transmettre
+                        vos informations personnelles.
+                    </p>
+                </div>
+            </div>
+
+            <div class="fj-trust__actions">
+                <div class="fj-alert fj-alert--danger">
+                    {% include "refonte/partials/icon.html" with name="alert-triangle" %}
+                    <div class="fj-alert__body">
+                        <span class="fj-alert__title">Aucun frais de dossier</span>
+                        <span>
+                            Un paiement préalable ne doit jamais être exigé pour postuler
+                            à une offre légitime.
+                        </span>
+                    </div>
+                </div>
+
+                <div class="fj-cluster">
+                    <a class="fj-btn fj-btn--secondary" href="{% url 'catalogue' %}">
+                        {% include "refonte/partials/icon.html" with name="search" %}
+                        Parcourir les offres
+                    </a>
+                    <a class="fj-btn fj-btn--ghost" href="{% url 'method' %}#controle-des-annonces">
+                        Voir le parcours de contrôle
+                        {% include "refonte/partials/icon.html" with name="arrow-right" %}
+                    </a>
+                </div>
+
+                <p class="fj-small">
+                    Pour signaler une annonce suspecte, ouvrez sa fiche et utilisez le
+                    lien «&nbsp;Signaler cette annonce&nbsp;», ou passez par la
+                    <a class="fj-link" href="{% url 'report_fraud' %}">page de signalement</a>.
+                    Chaque signalement est examiné par notre équipe.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

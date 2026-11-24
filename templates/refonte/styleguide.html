@@ -1,0 +1,468 @@
+{% extends "refonte/base.html" %}
+
+{% block title %}Charte visuelle — Faso Job{% endblock %}
+
+{% block content %}
+<div class="fj-container fj-section">
+    <header class="fj-stack" style="max-width: 52rem;">
+        <p class="fj-eyebrow">Développement interne</p>
+        <h1 class="fj-display">Charte visuelle Faso Job</h1>
+        <p class="fj-lead">
+            Référence unique des couleurs, de la typographie et des composants de la
+            refonte. Cette page n’est visible qu’en mode <code>DEBUG</code>.
+        </p>
+        <div class="fj-alert fj-alert--warning" role="note">
+            {% include "refonte/partials/icon.html" with name="alert-triangle" %}
+            <div class="fj-alert__body">
+                <span class="fj-alert__title">Contenu de démonstration</span>
+                <span>Les offres et les chiffres affichés ici sont factices. Ils ne doivent jamais être repris en production.</span>
+            </div>
+        </div>
+    </header>
+
+    <section class="sg-section" id="couleurs">
+        <div class="sg-section__header">
+            <p class="fj-eyebrow">01 — Couleurs</p>
+            <h2 class="fj-h2">Palette et rôles</h2>
+            <p class="fj-body">Les couleurs portent un rôle fonctionnel : bleu pour la marque et les actions, vert pour la vérification, orange pour l’attention, rouge pour le danger.</p>
+        </div>
+        <div class="sg-swatches">
+            <div class="sg-swatch">
+                <div class="sg-swatch__color" style="background: var(--fj-primary);"></div>
+                <div class="sg-swatch__meta"><div class="sg-swatch__name">Bleu principal</div><div class="sg-swatch__value">#176391</div></div>
+            </div>
+            <div class="sg-swatch">
+                <div class="sg-swatch__color" style="background: var(--fj-primary-soft);"></div>
+                <div class="sg-swatch__meta"><div class="sg-swatch__name">Bleu doux</div><div class="sg-swatch__value">#6CABDD</div></div>
+            </div>
+            <div class="sg-swatch">
+                <div class="sg-swatch__color" style="background: var(--fj-primary-pale);"></div>
+                <div class="sg-swatch__meta"><div class="sg-swatch__name">Bleu pâle</div><div class="sg-swatch__value">#EAF4FB</div></div>
+            </div>
+            <div class="sg-swatch">
+                <div class="sg-swatch__color" style="background: var(--fj-secondary);"></div>
+                <div class="sg-swatch__meta"><div class="sg-swatch__name">Vert vérifié</div><div class="sg-swatch__value">#16845F</div></div>
+            </div>
+            <div class="sg-swatch">
+                <div class="sg-swatch__color" style="background: var(--fj-whatsapp);"></div>
+                <div class="sg-swatch__meta"><div class="sg-swatch__name">WhatsApp</div><div class="sg-swatch__value">#25D366</div></div>
+            </div>
+            <div class="sg-swatch">
+                <div class="sg-swatch__color" style="background: var(--fj-ink);"></div>
+                <div class="sg-swatch__meta"><div class="sg-swatch__name">Encre</div><div class="sg-swatch__value">#0F172A</div></div>
+            </div>
+            <div class="sg-swatch">
+                <div class="sg-swatch__color" style="background: var(--fj-text);"></div>
+                <div class="sg-swatch__meta"><div class="sg-swatch__name">Texte</div><div class="sg-swatch__value">#334155</div></div>
+            </div>
+            <div class="sg-swatch">
+                <div class="sg-swatch__color" style="background: var(--fj-muted);"></div>
+                <div class="sg-swatch__meta"><div class="sg-swatch__name">Texte discret</div><div class="sg-swatch__value">#64748B</div></div>
+            </div>
+            <div class="sg-swatch">
+                <div class="sg-swatch__color" style="background: var(--fj-canvas);"></div>
+                <div class="sg-swatch__meta"><div class="sg-swatch__name">Fond</div><div class="sg-swatch__value">#F8FAFC</div></div>
+            </div>
+            <div class="sg-swatch">
+                <div class="sg-swatch__color" style="background: var(--fj-subtle);"></div>
+                <div class="sg-swatch__meta"><div class="sg-swatch__name">Fond discret</div><div class="sg-swatch__value">#F1F5F9</div></div>
+            </div>
+            <div class="sg-swatch">
+                <div class="sg-swatch__color" style="background: var(--fj-border);"></div>
+                <div class="sg-swatch__meta"><div class="sg-swatch__name">Bordure</div><div class="sg-swatch__value">#E2E8F0</div></div>
+            </div>
+            <div class="sg-swatch">
+                <div class="sg-swatch__color" style="background: var(--fj-warning-bg);"></div>
+                <div class="sg-swatch__meta"><div class="sg-swatch__name">Alerte</div><div class="sg-swatch__value">#FEF3C7</div></div>
+            </div>
+            <div class="sg-swatch">
+                <div class="sg-swatch__color" style="background: var(--fj-danger-bg);"></div>
+                <div class="sg-swatch__meta"><div class="sg-swatch__name">Danger</div><div class="sg-swatch__value">#FEE2E2</div></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="sg-section" id="typographie">
+        <div class="sg-section__header">
+            <p class="fj-eyebrow">02 — Typographie</p>
+            <h2 class="fj-h2">Hiérarchie système</h2>
+            <p class="fj-body">Police système : Segoe UI sur Windows, Roboto sur Android, SF sur Apple. Aucun téléchargement externe.</p>
+        </div>
+        <div class="sg-demo sg-stack">
+            <div>
+                <p class="sg-label">Display</p>
+                <p class="fj-display">Les opportunités professionnelles, au même endroit.</p>
+            </div>
+            <div>
+                <p class="sg-label">Titre 1</p>
+                <p class="fj-h1">Toutes les opportunités</p>
+            </div>
+            <div>
+                <p class="sg-label">Titre 2</p>
+                <p class="fj-h2">Dernières opportunités publiées</p>
+            </div>
+            <div>
+                <p class="sg-label">Titre 3</p>
+                <p class="fj-h3">Assistante comptable (H/F)</p>
+            </div>
+            <div>
+                <p class="sg-label">Titre 4</p>
+                <p class="fj-h4">Informations essentielles</p>
+            </div>
+            <div>
+                <p class="sg-label">Chapô</p>
+                <p class="fj-lead">Retrouvez des offres d’emploi, des stages et d’autres opportunités au Burkina Faso.</p>
+            </div>
+            <div>
+                <p class="sg-label">Corps</p>
+                <p class="fj-body">Consultez les informations essentielles et accédez directement aux modalités de candidature indiquées par l’employeur.</p>
+            </div>
+            <div>
+                <p class="sg-label">Petit texte</p>
+                <p class="fj-small">Publié il y a 2 jours · Source vérifiée le 4 novembre 2026</p>
+            </div>
+            <div>
+                <p class="sg-label">Étiquette</p>
+                <p class="fj-label">Date limite de candidature</p>
+            </div>
+            <div>
+                <p class="sg-label">Surtitre</p>
+                <p class="fj-eyebrow">Catalogue public</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="sg-section" id="boutons">
+        <div class="sg-section__header">
+            <p class="fj-eyebrow">03 — Boutons</p>
+            <h2 class="fj-h2">Actions</h2>
+        </div>
+        <div class="sg-grid sg-grid--2">
+            <div class="sg-demo">
+                <p class="sg-label">Variantes</p>
+                <div class="sg-row">
+                    <button class="fj-btn fj-btn--primary" type="button">Rechercher</button>
+                    <button class="fj-btn fj-btn--solid" type="button">Voir l’offre</button>
+                    <button class="fj-btn fj-btn--secondary" type="button">Annuler</button>
+                </div>
+                <div class="sg-row">
+                    <button class="fj-btn fj-btn--whatsapp" type="button">
+                        {% include "refonte/partials/icon.html" with name="whatsapp" extra_class="fj-icon--solid" %}
+                        Postuler sur WhatsApp
+                    </button>
+                    <button class="fj-btn fj-btn--danger" type="button">Signaler</button>
+                    <button class="fj-btn fj-btn--ghost" type="button">Effacer les filtres</button>
+                </div>
+                <div class="sg-row">
+                    <button class="fj-btn fj-btn--primary fj-btn--sm" type="button">Petit</button>
+                    <button class="fj-btn fj-btn--primary" type="button">Normal</button>
+                    <button class="fj-btn fj-btn--primary fj-btn--lg" type="button">Grand</button>
+                    <button class="fj-btn fj-btn--primary" type="button" disabled>Désactivé</button>
+                </div>
+            </div>
+            <div class="sg-demo">
+                <p class="sg-label">Action pleine largeur</p>
+                <button class="fj-btn fj-btn--primary fj-btn--block" type="button">
+                    Soumettre l’annonce pour vérification
+                    {% include "refonte/partials/icon.html" with name="arrow-right" %}
+                </button>
+                <button class="fj-btn fj-btn--whatsapp fj-btn--block" type="button">
+                    {% include "refonte/partials/icon.html" with name="whatsapp" extra_class="fj-icon--solid" %}
+                    Ouvrir la discussion WhatsApp
+                </button>
+                <p class="fj-small">Hauteur minimale : 44 px sur mobile, 48 px sur desktop.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="sg-section" id="badges">
+        <div class="sg-section__header">
+            <p class="fj-eyebrow">04 — Badges</p>
+            <h2 class="fj-h2">États et vérifications</h2>
+            <p class="fj-body">Un badge ne repose jamais sur la couleur seule : il associe toujours une icône et un texte.</p>
+        </div>
+        <div class="sg-demo">
+            <div class="sg-row">
+                <span class="fj-badge fj-badge--success">{% include "refonte/partials/icon.html" with name="shield-check" %} Employeur vérifié</span>
+                <span class="fj-badge fj-badge--success">{% include "refonte/partials/icon.html" with name="check-circle" %} Disponibilité confirmée</span>
+                <span class="fj-badge fj-badge--info">{% include "refonte/partials/icon.html" with name="external-link" %} Source retrouvée</span>
+                <span class="fj-badge fj-badge--warning">{% include "refonte/partials/icon.html" with name="alert-triangle" %} Source à vérifier</span>
+                <span class="fj-badge fj-badge--danger">{% include "refonte/partials/icon.html" with name="x-circle" %} Offre fermée</span>
+                <span class="fj-badge fj-badge--whatsapp">{% include "refonte/partials/icon.html" with name="whatsapp" extra_class="fj-icon--solid" %} Candidature WhatsApp</span>
+                <span class="fj-badge fj-badge--neutral">{% include "refonte/partials/icon.html" with name="clock" %} En attente</span>
+                <span class="fj-badge fj-badge--brand">{% include "refonte/partials/icon.html" with name="check" %} Publiée</span>
+            </div>
+            <div class="sg-row">
+                <span class="fj-chip">{% include "refonte/partials/icon.html" with name="map-pin" %} Ouagadougou</span>
+                <span class="fj-chip">{% include "refonte/partials/icon.html" with name="briefcase" %} CDI</span>
+                <span class="fj-chip">{% include "refonte/partials/icon.html" with name="credit-card" %} 180 000 – 250 000 FCFA</span>
+                <span class="fj-chip fj-chip--outline">{% include "refonte/partials/icon.html" with name="calendar" %} Clôture le 15/12/2026</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="sg-section" id="cartes">
+        <div class="sg-section__header">
+            <p class="fj-eyebrow">05 — Cartes d’offre</p>
+            <h2 class="fj-h2">Trois états d’échéance</h2>
+        </div>
+        <div class="fj-grid sg-grid--3">
+            <article class="fj-offer-card">
+                <a class="fj-offer-card__overlay" href="#" aria-label="Exemple d’offre : Assistante comptable"></a>
+                <div class="fj-offer-card__header">
+                    <div class="fj-offer-card__badges">
+                        <span class="fj-badge fj-badge--success">{% include "refonte/partials/icon.html" with name="shield-check" %} Employeur vérifié</span>
+                        <span class="fj-badge fj-badge--info">{% include "refonte/partials/icon.html" with name="external-link" %} Source retrouvée</span>
+                    </div>
+                    <span class="fj-offer-card__posted">Exemple</span>
+                </div>
+                <div>
+                    <h3 class="fj-offer-card__title"><a href="#">Assistante comptable (H/F)</a></h3>
+                    <p class="fj-offer-card__company">Cabinet Fictif du Faso</p>
+                </div>
+                <div class="fj-offer-card__meta">
+                    <span class="fj-chip">{% include "refonte/partials/icon.html" with name="map-pin" %} Ouagadougou</span>
+                    <span class="fj-chip">{% include "refonte/partials/icon.html" with name="briefcase" %} CDI</span>
+                    <span class="fj-chip">{% include "refonte/partials/icon.html" with name="credit-card" %} 180 000 – 250 000 FCFA</span>
+                </div>
+                <p class="fj-offer-card__deadline fj-text-secondary">
+                    {% include "refonte/partials/icon.html" with name="clock" extra_class="fj-icon--sm" %}
+                    Reste 12 jours pour postuler
+                </p>
+                <div class="fj-offer-card__footer">
+                    <span class="fj-small">Publié il y a 2 jours</span>
+                    <a class="fj-btn fj-btn--secondary fj-btn--sm" href="#">Voir la fiche</a>
+                </div>
+            </article>
+
+            <article class="fj-offer-card is-urgent">
+                <a class="fj-offer-card__overlay" href="#" aria-label="Exemple d’offre : Chargé de projet"></a>
+                <div class="fj-offer-card__header">
+                    <div class="fj-offer-card__badges">
+                        <span class="fj-badge fj-badge--success">{% include "refonte/partials/icon.html" with name="shield-check" %} Employeur vérifié</span>
+                        <span class="fj-badge fj-badge--whatsapp">{% include "refonte/partials/icon.html" with name="whatsapp" extra_class="fj-icon--solid" %} WhatsApp</span>
+                    </div>
+                    <span class="fj-offer-card__posted">Exemple</span>
+                </div>
+                <div>
+                    <h3 class="fj-offer-card__title"><a href="#">Chargé de projet Eau &amp; Assainissement</a></h3>
+                    <p class="fj-offer-card__company">ONG Fictive Sahel</p>
+                </div>
+                <div class="fj-offer-card__meta">
+                    <span class="fj-chip">{% include "refonte/partials/icon.html" with name="map-pin" %} Dori</span>
+                    <span class="fj-chip">{% include "refonte/partials/icon.html" with name="briefcase" %} CDD 12 mois</span>
+                    <span class="fj-chip">{% include "refonte/partials/icon.html" with name="credit-card" %} Selon profil</span>
+                </div>
+                <p class="fj-offer-card__deadline fj-text-danger">
+                    {% include "refonte/partials/icon.html" with name="clock" extra_class="fj-icon--sm" %}
+                    Reste 3 jours pour postuler
+                </p>
+                <div class="fj-offer-card__footer">
+                    <span class="fj-small">Publié il y a 4 jours</span>
+                    <div class="fj-cluster">
+                        <a class="fj-btn fj-btn--whatsapp fj-btn--sm" href="#">
+                            {% include "refonte/partials/icon.html" with name="whatsapp" extra_class="fj-icon--solid" %}
+                            WhatsApp
+                        </a>
+                        <a class="fj-btn fj-btn--secondary fj-btn--sm" href="#">Voir la fiche</a>
+                    </div>
+                </div>
+            </article>
+
+            <article class="fj-offer-card is-expired">
+                <a class="fj-offer-card__overlay" href="#" aria-label="Exemple d’offre : Technicien informatique"></a>
+                <div class="fj-offer-card__header">
+                    <div class="fj-offer-card__badges">
+                        <span class="fj-badge fj-badge--danger">{% include "refonte/partials/icon.html" with name="x-circle" %} Offre fermée</span>
+                    </div>
+                    <span class="fj-offer-card__posted">Exemple</span>
+                </div>
+                <div>
+                    <h3 class="fj-offer-card__title"><a href="#">Technicien informatique &amp; réseaux</a></h3>
+                    <p class="fj-offer-card__company">Structure Fictive</p>
+                </div>
+                <div class="fj-offer-card__meta">
+                    <span class="fj-chip">{% include "refonte/partials/icon.html" with name="map-pin" %} Koudougou</span>
+                    <span class="fj-chip">{% include "refonte/partials/icon.html" with name="briefcase" %} Prestation</span>
+                </div>
+                <p class="fj-offer-card__deadline fj-text-danger">
+                    {% include "refonte/partials/icon.html" with name="clock" extra_class="fj-icon--sm" %}
+                    Date limite dépassée de 2 jours
+                </p>
+                <div class="fj-offer-card__footer">
+                    <span class="fj-small">Conservée à titre d’historique</span>
+                    <button class="fj-btn fj-btn--secondary fj-btn--sm" type="button" disabled>Candidatures fermées</button>
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <section class="sg-section" id="formulaires">
+        <div class="sg-section__header">
+            <p class="fj-eyebrow">06 — Formulaires</p>
+            <h2 class="fj-h2">Champs et choix</h2>
+        </div>
+        <div class="sg-grid sg-grid--2">
+            <div class="fj-card fj-stack">
+                <div class="fj-field">
+                    <label for="sg-title">Intitulé du poste <span class="fj-field__required" aria-hidden="true">*</span></label>
+                    <input class="fj-input" id="sg-title" type="text" placeholder="Ex. Assistant comptable">
+                    <p class="fj-field__help">Précisez un titre clair, explicite et fidèle à l’intitulé du recruteur.</p>
+                </div>
+                <div class="fj-field">
+                    <label for="sg-city">Localisation</label>
+                    <select class="fj-select" id="sg-city">
+                        <option value="">Sélectionnez une ville</option>
+                        <option>Ouagadougou</option>
+                        <option>Bobo-Dioulasso</option>
+                        <option>Koudougou</option>
+                    </select>
+                </div>
+                <div class="fj-field has-error">
+                    <label for="sg-email">E-mail de contact <span class="fj-field__required" aria-hidden="true">*</span></label>
+                    <input class="fj-input" id="sg-email" type="email" value="adresse-invalide">
+                    <p class="fj-field__error" role="alert">Saisissez une adresse e-mail valide.</p>
+                </div>
+                <div class="fj-field">
+                    <label for="sg-description">Description</label>
+                    <textarea class="fj-textarea" id="sg-description" rows="4" placeholder="Missions, profil recherché, conditions…"></textarea>
+                </div>
+            </div>
+
+            <div class="fj-card fj-stack">
+                <fieldset class="fj-fieldset">
+                    <legend class="fj-fieldset__legend">Vous proposez cette offre en qualité de</legend>
+                    <div class="fj-choice-grid">
+                        <label class="fj-choice">
+                            <input type="radio" name="sg-role" checked>
+                            <span class="fj-choice__text">
+                                <span class="fj-choice__title">Recruteur</span>
+                                <span class="fj-choice__hint">L’offre émane de mon institution.</span>
+                            </span>
+                        </label>
+                        <label class="fj-choice">
+                            <input type="radio" name="sg-role">
+                            <span class="fj-choice__text">
+                                <span class="fj-choice__title">Veilleur</span>
+                                <span class="fj-choice__hint">J’ai repéré cette offre publiquement.</span>
+                            </span>
+                        </label>
+                    </div>
+                </fieldset>
+
+                <label class="fj-check">
+                    <input type="checkbox">
+                    <span>Je certifie que cette opportunité ne demande aucun frais de dossier, de badge ou de visite médicale payante.</span>
+                </label>
+
+                <div class="fj-alert fj-alert--info">
+                    {% include "refonte/partials/icon.html" with name="info" extra_class="fj-icon--sm" %}
+                    <span>Aucune annonce n’est publiée automatiquement : chaque proposition est contrôlée.</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="sg-section" id="alertes">
+        <div class="sg-section__header">
+            <p class="fj-eyebrow">07 — Alertes</p>
+            <h2 class="fj-h2">Messages</h2>
+        </div>
+        <div class="sg-stack">
+            <div class="fj-alert fj-alert--info">
+                {% include "refonte/partials/icon.html" with name="info" %}
+                <div class="fj-alert__body"><span class="fj-alert__title">Information</span><span>La disponibilité est confirmée par un contrôle récent.</span></div>
+            </div>
+            <div class="fj-alert fj-alert--success">
+                {% include "refonte/partials/icon.html" with name="check-circle" %}
+                <div class="fj-alert__body"><span class="fj-alert__title">Succès</span><span>Votre proposition a bien été reçue et sera examinée.</span></div>
+            </div>
+            <div class="fj-alert fj-alert--warning">
+                {% include "refonte/partials/icon.html" with name="alert-triangle" %}
+                <div class="fj-alert__body"><span class="fj-alert__title">Attention</span><span>Cette offre arrive à échéance dans moins de 3 jours.</span></div>
+            </div>
+            <div class="fj-alert fj-alert--danger">
+                {% include "refonte/partials/icon.html" with name="x-circle" %}
+                <div class="fj-alert__body"><span class="fj-alert__title">Danger</span><span>Aucun frais de dossier ne doit être exigé pour postuler.</span></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="sg-section" id="navigation">
+        <div class="sg-section__header">
+            <p class="fj-eyebrow">08 — Navigation</p>
+            <h2 class="fj-h2">Fil d’Ariane, onglets, pagination</h2>
+        </div>
+        <div class="sg-stack">
+            <nav class="fj-breadcrumb" aria-label="Fil d’Ariane d’exemple">
+                <a href="#">Accueil</a>
+                <span class="fj-breadcrumb__separator" aria-hidden="true">/</span>
+                <a href="#">Offres</a>
+                <span class="fj-breadcrumb__separator" aria-hidden="true">/</span>
+                <span aria-current="page">Assistante comptable</span>
+            </nav>
+
+            <nav class="fj-tabs" aria-label="Types d’opportunité">
+                <a class="fj-tab is-active" href="#">Toutes <span class="fj-tab__count">(12)</span></a>
+                <a class="fj-tab" href="#">Emploi <span class="fj-tab__count">(8)</span></a>
+                <a class="fj-tab" href="#">Stage <span class="fj-tab__count">(3)</span></a>
+                <a class="fj-tab" href="#">Mission <span class="fj-tab__count">(1)</span></a>
+            </nav>
+
+            <nav class="fj-pagination" aria-label="Pagination d’exemple">
+                <span class="fj-pagination__link" aria-disabled="true">{% include "refonte/partials/icon.html" with name="chevron-left" %}</span>
+                <a class="fj-pagination__link is-active" href="#" aria-current="page">1</a>
+                <a class="fj-pagination__link" href="#">2</a>
+                <a class="fj-pagination__link" href="#">3</a>
+                <a class="fj-pagination__link" href="#">{% include "refonte/partials/icon.html" with name="chevron-right" %}</a>
+            </nav>
+
+            <div class="fj-empty">
+                <span class="fj-empty__icon">{% include "refonte/partials/icon.html" with name="search" extra_class="fj-icon--lg" %}</span>
+                <p class="fj-h3">Aucune offre ne correspond</p>
+                <p class="fj-small">Élargissez la recherche ou effacez certains filtres.</p>
+                <a class="fj-btn fj-btn--secondary" href="#">Effacer les filtres</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="sg-section" id="icones">
+        <div class="sg-section__header">
+            <p class="fj-eyebrow">09 — Icônes</p>
+            <h2 class="fj-h2">Sprite SVG local</h2>
+            <p class="fj-body">Tracé de 2 px, taille héritée du texte. Aucune police d’icônes.</p>
+        </div>
+        <div class="sg-icon-grid">
+            <span class="sg-icon-item">{% include "refonte/partials/icon.html" with name="search" %} search</span>
+            <span class="sg-icon-item">{% include "refonte/partials/icon.html" with name="map-pin" %} map-pin</span>
+            <span class="sg-icon-item">{% include "refonte/partials/icon.html" with name="briefcase" %} briefcase</span>
+            <span class="sg-icon-item">{% include "refonte/partials/icon.html" with name="graduation" %} graduation</span>
+            <span class="sg-icon-item">{% include "refonte/partials/icon.html" with name="globe" %} globe</span>
+            <span class="sg-icon-item">{% include "refonte/partials/icon.html" with name="building" %} building</span>
+            <span class="sg-icon-item">{% include "refonte/partials/icon.html" with name="shield-check" %} shield-check</span>
+            <span class="sg-icon-item">{% include "refonte/partials/icon.html" with name="check-circle" %} check-circle</span>
+            <span class="sg-icon-item">{% include "refonte/partials/icon.html" with name="alert-triangle" %} alert-triangle</span>
+            <span class="sg-icon-item">{% include "refonte/partials/icon.html" with name="x-circle" %} x-circle</span>
+            <span class="sg-icon-item">{% include "refonte/partials/icon.html" with name="clock" %} clock</span>
+            <span class="sg-icon-item">{% include "refonte/partials/icon.html" with name="calendar" %} calendar</span>
+            <span class="sg-icon-item">{% include "refonte/partials/icon.html" with name="credit-card" %} credit-card</span>
+            <span class="sg-icon-item">{% include "refonte/partials/icon.html" with name="file-text" %} file-text</span>
+            <span class="sg-icon-item">{% include "refonte/partials/icon.html" with name="users" %} users</span>
+            <span class="sg-icon-item">{% include "refonte/partials/icon.html" with name="mail" %} mail</span>
+            <span class="sg-icon-item">{% include "refonte/partials/icon.html" with name="phone" %} phone</span>
+            <span class="sg-icon-item">{% include "refonte/partials/icon.html" with name="external-link" %} external-link</span>
+            <span class="sg-icon-item">{% include "refonte/partials/icon.html" with name="arrow-right" %} arrow-right</span>
+            <span class="sg-icon-item">{% include "refonte/partials/icon.html" with name="chevron-right" %} chevron-right</span>
+            <span class="sg-icon-item">{% include "refonte/partials/icon.html" with name="menu" %} menu</span>
+            <span class="sg-icon-item">{% include "refonte/partials/icon.html" with name="x" %} x</span>
+            <span class="sg-icon-item">{% include "refonte/partials/icon.html" with name="user" %} user</span>
+            <span class="sg-icon-item">{% include "refonte/partials/icon.html" with name="filter" %} filter</span>
+            <span class="sg-icon-item">{% include "refonte/partials/icon.html" with name="lock" %} lock</span>
+            <span class="sg-icon-item">{% include "refonte/partials/icon.html" with name="share" %} share</span>
+            <span class="sg-icon-item">{% include "refonte/partials/icon.html" with name="eye" %} eye</span>
+            <span class="sg-icon-item">{% include "refonte/partials/icon.html" with name="download" %} download</span>
+            <span class="sg-icon-item">{% include "refonte/partials/icon.html" with name="whatsapp" extra_class="fj-icon--solid" %} whatsapp</span>
+        </div>
+    </section>
+</div>
+{% endblock %}

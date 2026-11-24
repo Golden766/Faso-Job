@@ -1,0 +1,173 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block title %}{{ title }} | Faso Job — Administration{% endblock %}
+
+{% block bodyclass %}{{ block.super }} editorial-dashboard two-factor{% endblock %}
+
+{% block content_title %}{% endblock %}
+{% block content_subtitle %}{% endblock %}
+
+{% block content %}
+<div class="dashboard-main">
+        <div class="dashboard-page-heading">
+            <div>
+                <p class="dashboard-eyebrow">Espace de gestion</p>
+                <h1>Sécurité du compte</h1>
+                <p>
+                    La double authentification demande un code à 6 chiffres
+                    généré par votre téléphone à chaque connexion.
+                </p>
+            </div>
+            <div class="dashboard-heading-actions">
+                <a class="dashboard-secondary-action" href="{% url 'admin:index' %}">
+                    Retour au tableau de bord
+                </a>
+            </div>
+        </div>
+
+        <section class="dashboard-section" aria-labelledby="state-title">
+            <div class="dashboard-section-heading">
+                <h2 id="state-title">État de la protection</h2>
+                <span>La double authentification protège l’administration : elle empêche qu’un mot de passe volé suffise à publier une annonce.</span>
+            </div>
+
+            {% if is_protected %}
+                <div class="dashboard-alert dashboard-alert--calm">
+                    <span class="dashboard-alert__icon" aria-hidden="true">✓</span>
+                    <span class="dashboard-alert__body">
+                        <strong>Double authentification active</strong>
+                        <span>
+                            {% if device.confirmed_at %}
+                            Activée le {{ device.confirmed_at|date:"d/m/Y à H:i" }}.
+                            {% endif %}
+                            {% if device.last_used_at %}
+                            Dernière utilisation : {{ device.last_used_at|date:"d/m/Y à H:i" }}.
+                            {% endif %}
+                        </span>
+                    </span>
+                </div>
+            {% else %}
+                <div class="dashboard-alert">
+                    <span class="dashboard-alert__icon" aria-hidden="true">!</span>
+                    <span class="dashboard-alert__body">
+                        <strong>Double authentification désactivée</strong>
+                        <span>Un mot de passe seul donne accès à l’administration. Activez la double authentification ci-dessous.</span>
+                    </span>
+                </div>
+            {% endif %}
+        </section>
+
+        {% if pending_secret %}
+        <section class="dashboard-section" aria-labelledby="activate-title">
+            <div class="dashboard-section-heading">
+                <h2 id="activate-title">Activer la double authentification</h2>
+                <span>Étape 2 sur 2 : scannez le code avec votre téléphone, puis saisissez le code affiché.</span>
+            </div>
+
+            <div class="two-factor-setup">
+                <div class="two-factor-setup__qr">
+                    <div class="two-factor-setup__qr-image" role="img" aria-label="QR code de configuration">
+                        {{ qr_code_svg|safe }}
+                    </div>
+                    <p class="two-factor-setup__hint">
+                        Scannez ce QR code avec Google Authenticator, Authy ou Aegis.
+                    </p>
+                </div>
+
+                <div class="two-factor-setup__manual">
+                    <h3>Sans caméra ?</h3>
+                    <p>Saisissez cette clé manuellement dans votre application :</p>
+                    <p class="two-factor-setup__key"><code>{{ pending_secret }}</code></p>
+                    <p class="two-factor-setup__hint">
+                        Cette clé est un secret : ne la communiquez à personne.
+                    </p>
+                </div>
+            </div>
+
+            <form method="post" class="two-factor-form">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="confirm">
+                <div class="form-row">
+                    <label for="id_code">Code à 6 chiffres affiché par l’application :</label>
+                    <input type="text" name="code" id="id_code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" required>
+                </div>
+                <div class="submit-row">
+                    <input type="submit" value="Activer la double authentification">
+                </div>
+            </form>
+        </section>
+        {% elif not is_protected %}
+        <section class="dashboard-section" aria-labelledby="start-title">
+            <div class="dashboard-section-heading">
+                <h2 id="start-title">Activer la double authentification</h2>
+                <span>Étape 1 sur 2 : préparez votre téléphone, puis cliquez sur le bouton ci-dessous pour afficher le QR code.</span>
+            </div>
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="start">
+                <div class="submit-row">
+                    <input type="submit" value="Afficher le QR code de configuration">
+                </div>
+            </form>
+        </section>
+        {% endif %}
+
+        {% if recovery_codes %}
+        <section class="dashboard-section" aria-labelledby="recovery-title">
+            <div class="dashboard-section-heading">
+                <h2 id="recovery-title">Codes de secours</h2>
+                <span>Conservez-les hors de votre téléphone : ils permettent de vous reconnecter si vous le perdez.</span>
+            </div>
+            <div class="two-factor-recovery">
+                <p class="two-factor-recovery__warning">
+                    Ces codes ne sont affichés qu’une seule fois. Chaque code ne sert qu’une fois.
+                </p>
+                <ul class="two-factor-recovery__list">
+                    {% for code in recovery_codes %}
+                        <li><code>{{ code }}</code></li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </section>
+        {% elif is_protected %}
+        <section class="dashboard-section" aria-labelledby="recovery-title">
+            <div class="dashboard-section-heading">
+                <h2 id="recovery-title">Codes de secours</h2>
+                <span>{{ recovery_code_count }} code(s) de secours disponible(s).</span>
+            </div>
+            <form method="post" action="{% url 'two_factor_recovery_codes' %}">
+                {% csrf_token %}
+                <div class="submit-row">
+                    <input type="submit" value="Générer de nouveaux codes de secours">
+                </div>
+            </form>
+        </section>
+        {% endif %}
+
+        {% if is_protected %}
+        <section class="dashboard-section" aria-labelledby="disable-title">
+            <div class="dashboard-section-heading">
+                <h2 id="disable-title">Désactiver</h2>
+                <span>À n’utiliser qu’en cas de nécessité, par exemple un téléphone perdu sans code de secours.</span>
+            </div>
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="deactivate">
+                <div class="submit-row">
+                    <input type="submit" value="Désactiver la double authentification" class="fj-admin-danger">
+                </div>
+            </form>
+        </section>
+        {% endif %}
+
+        <aside class="dashboard-help">
+            <span class="dashboard-help-icon" aria-hidden="true">i</span>
+            <p>
+                <strong>Astuce :</strong> l’heure de votre téléphone doit être à jour.
+                Si le code est refusé alors qu’il semble correct, vérifiez le fuseau
+                horaire automatique de l’appareil.
+            </p>
+        </aside>
+    </div>
+{% endblock %}

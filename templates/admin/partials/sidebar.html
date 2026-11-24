@@ -1,0 +1,56 @@
+{% load admin_ui %}
+<aside class="fj-admin-sidebar" aria-label="Navigation d'administration">
+    <p class="fj-admin-sidebar__label">Menu admin</p>
+    <a class="fj-admin-sidebar__link{% admin_section 'Tableau de bord' %}" href="{% url 'admin:index' %}">Tableau de bord</a>
+    {% if perms.offres.view_offer %}
+        <a class="fj-admin-sidebar__link{% admin_section 'Offres' %}" href="{% url 'admin:offres_offer_changelist' %}">Offres</a>
+        <a class="fj-admin-sidebar__link{% admin_section 'Offres expirées' %}" href="{% url 'admin-expired-offers' %}">Offres expirées</a>
+    {% endif %}
+    {% if perms.offres.view_offersubmission %}
+        <a class="fj-admin-sidebar__link{% admin_section 'Soumissions' %}" href="{% url 'admin:offres_offersubmission_changelist' %}">Soumissions</a>
+    {% endif %}
+    {% if perms.offres.view_offerreport %}
+        <a class="fj-admin-sidebar__link{% admin_section 'Signalements' %}" href="{% url 'admin:offres_offerreport_changelist' %}">Signalements</a>
+    {% endif %}
+    {% if perms.offres.view_blacklistedcontact %}
+        <a class="fj-admin-sidebar__link{% admin_section 'Liste noire' %}" href="{% url 'admin:offres_blacklistedcontact_changelist' %}">Liste noire</a>
+    {% endif %}
+
+    <p class="fj-admin-sidebar__label">Référentiel</p>
+    {% if perms.offres.view_source %}
+        <a class="fj-admin-sidebar__link{% admin_section 'Sources' %}" href="{% url 'admin:offres_source_changelist' %}">Sources</a>
+    {% endif %}
+    {% if perms.offres.view_category %}
+        <a class="fj-admin-sidebar__link{% admin_section 'Catégories' %}" href="{% url 'admin:offres_category_changelist' %}">Catégories</a>
+    {% endif %}
+
+    <p class="fj-admin-sidebar__label">Pilotage</p>
+    <a class="fj-admin-sidebar__link{% admin_section 'Rapport d’activité' %}" href="{% url 'admin-activity-report' %}">Rapport d’activité</a>
+    {% if perms.offres.view_collectedannouncement %}
+        <a class="fj-admin-sidebar__link{% admin_section 'Centre de veille' %}" href="{% url 'admin-veille' %}">Centre de veille</a>
+    {% endif %}
+    {% if perms.offres.view_outboundmessage %}
+        <a class="fj-admin-sidebar__link{% admin_section 'Messages envoyés' %}" href="{% url 'admin:offres_outboundmessage_changelist' %}">Messages envoyés</a>
+    {% endif %}
+    {% if perms.offres.view_notificationrecipient %}
+        <a class="fj-admin-sidebar__link{% admin_section 'Notifications' %}" href="{% url 'admin:offres_notificationrecipient_changelist' %}">Notifications</a>
+    {% endif %}
+    <a class="fj-admin-sidebar__link{% admin_section 'Sauvegardes' %}" href="{% url 'admin-backups' %}">Sauvegardes</a>
+
+    <p class="fj-admin-sidebar__label">Réglages</p>
+    {% if perms.offres.view_platformsettings %}
+        <a class="fj-admin-sidebar__link{% admin_section 'Paramètres' %}" href="{% url 'admin:offres_platformsettings_change' 1 %}">Paramètres</a>
+    {% endif %}
+    {% if perms.auth.view_user %}
+        <a class="fj-admin-sidebar__link{% admin_section 'Utilisateurs' %}" href="{% url 'admin:auth_user_changelist' %}">Utilisateurs</a>
+    {% endif %}
+    {% if perms.auth.view_group %}
+        <a class="fj-admin-sidebar__link{% admin_section 'Rôles' %}" href="{% url 'admin:auth_group_changelist' %}">Rôles</a>
+    {% endif %}
+    <a class="fj-admin-sidebar__link{% admin_section 'Sécurité du compte' %}" href="{% url 'two_factor_settings' %}">Sécurité du compte</a>
+    {% if perms.offres.view_twofactordevice %}
+        <a class="fj-admin-sidebar__link{% admin_section 'Appareils 2FA' %}" href="{% url 'admin:offres_twofactordevice_changelist' %}">Appareils 2FA</a>
+    {% endif %}
+
+    <a class="fj-admin-sidebar__link fj-admin-sidebar__link--external" href="{% url 'home' %}" target="_blank" rel="noopener">Voir le site public</a>
+</aside>
