@@ -25,20 +25,19 @@ partager, tout en conservant leur source et leur véritable canal de candidature
 
 ## Démarrer en local
 
-Prérequis : Python 3.11 ou 3.12, Git et VS Code.
+Prérequis : Python 3.12, Git et VS Code. Depuis la racine du dépôt, dans
+PowerShell :
 
-```bash
-python -m venv .venv
-.venv\Scripts\activate
-pip install django psycopg2-binary python-dotenv
+```powershell
+py -3.12 -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe manage.py runserver
 ```
 
-Ensuite, créer le projet Django :
+Pour appliquer les migrations lors d'une première installation :
 
-```bash
-django-admin startproject plateforme_offres .
-python manage.py migrate
-python manage.py runserver
+```powershell
+.\.venv\Scripts\python.exe manage.py migrate
 ```
 
 Ouvrir ensuite l'URL locale de Django, généralement :
