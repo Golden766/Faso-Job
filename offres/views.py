@@ -398,6 +398,7 @@ def catalogue_view(request):
         'type_tabs': type_tabs,
         'active_filters': active_filters,
         'has_filters': bool(active_filters),
+        'total_published': total_published,
         'salary_min': salary_min,
         'salary_max': salary_max,
         'salary_error': salary_error,

@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="{% static 'css/refonte/tokens.css' %}">
     <link rel="stylesheet" href="{% static 'css/refonte/base.css' %}">
     <link rel="stylesheet" href="{% static 'css/refonte/components.css' %}">
-    <link rel="stylesheet" href="{% static 'css/refonte/pages.css' %}">
+    <link rel="stylesheet" href="{% static 'css/refonte/pages.css' %}?v=20261127-1">
     {% block extra_head %}{% endblock %}
 </head>
 <body class="{% block body_class %}has-bottom-nav{% endblock %}">
@@ -34,7 +34,7 @@
     {% include "refonte/partials/footer.html" %}
     {% include "refonte/partials/mobile_nav.html" %}
     <script src="{% static 'js/favorites.js' %}?v=20261113-2" defer></script>
-    <script src="{% static 'js/public_loading.js' %}?v=20261114-1" defer></script>
+    <script src="{% static 'js/public_loading.js' %}?v=20261127-1" defer></script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>

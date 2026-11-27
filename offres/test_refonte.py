@@ -108,6 +108,20 @@ class CatalogueViewTest(TestCase):
         self.assertContains(response, 'Fil d’Ariane')
         self.assertNotContains(response, 'href="#"')
 
+    def test_catalogue_explains_when_there_are_no_published_offers(self):
+        response = self.client.get(reverse('catalogue'))
+
+        self.assertContains(response, 'Aucune offre n’est publiée pour le moment')
+        self.assertNotContains(response, 'Aucune offre ne correspond à ces critères')
+
+    def test_catalogue_keeps_filtered_empty_state_when_offers_exist(self):
+        make_published_offer('Offre disponible')
+
+        response = self.client.get(reverse('catalogue'), {'q': 'introuvable'})
+
+        self.assertContains(response, 'Aucune offre ne correspond à ces critères')
+        self.assertNotContains(response, 'Aucune offre n’est publiée pour le moment')
+
     def test_catalogue_type_tabs_are_computed_from_database(self):
         make_published_offer('Offre CDI', employment_type='CDI')
         make_published_offer('Offre stage', employment_type='Stage')

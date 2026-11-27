@@ -198,11 +198,19 @@
                 <span class="fj-empty__icon">
                     {% include "refonte/partials/icon.html" with name="search" extra_class="fj-icon--lg" %}
                 </span>
-                <p class="fj-h3">Aucune offre ne correspond à ces critères</p>
-                <p class="fj-small">
-                    Élargissez la recherche ou retirez certains filtres pour retrouver
-                    davantage d’opportunités.
-                </p>
+                {% if total_published == 0 and not has_filters %}
+                    <p class="fj-h3">Aucune offre n’est publiée pour le moment</p>
+                    <p class="fj-small">
+                        Les annonces apparaissent ici après vérification de leur source.
+                        Revenez bientôt ou proposez une annonce.
+                    </p>
+                {% else %}
+                    <p class="fj-h3">Aucune offre ne correspond à ces critères</p>
+                    <p class="fj-small">
+                        Élargissez la recherche ou retirez certains filtres pour retrouver
+                        davantage d’opportunités.
+                    </p>
+                {% endif %}
                 {% if has_filters %}
                     <a class="fj-btn fj-btn--secondary" href="{% url 'catalogue' %}">Effacer les filtres</a>
                 {% else %}

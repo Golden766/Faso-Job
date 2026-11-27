@@ -37,14 +37,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  document.querySelectorAll('button[type="submit"]').forEach((button) => {
-    button.addEventListener('click', () => {
-      if (button.disabled) return;
-      if (button.dataset.skipLoading === 'true') return;
-      applyButtonLoadingState(button);
-    });
-  });
-
   document.querySelectorAll('form').forEach((form) => {
     form.addEventListener('submit', () => {
       if (form.dataset.skipLoader === 'true') return;

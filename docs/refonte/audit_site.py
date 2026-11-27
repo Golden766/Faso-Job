@@ -18,6 +18,7 @@ from django.contrib.auth import get_user_model  # noqa: E402
 from django.db import transaction  # noqa: E402
 from django.test import Client  # noqa: E402
 from django.urls import reverse  # noqa: E402
+from django.utils import timezone  # noqa: E402
 
 from django.conf import settings  # noqa: E402
 settings.ALLOWED_HOSTS = list(settings.ALLOWED_HOSTS) + ['testserver']
@@ -63,6 +64,22 @@ print('  slugs en double             :', list(doublons_slug))
 
 if not Offer.objects.exists():
     problemes.append('Aucune offre en base : le catalogue serait vide.')
+
+offres_publiques = Offer.objects.public().count()
+offres_publiees_expirees = Offer.objects.filter(
+    status=Offer.STATUS_PUBLISHED,
+    is_published=True,
+    deadline__lt=timezone.localdate(),
+).count()
+print('  offres publiques visibles  :', offres_publiques)
+print('  offres publiees expirees   :', offres_publiees_expirees)
+if Offer.objects.exists() and not offres_publiques:
+    problemes.append('Aucune offre publique visible malgré des offres en base.')
+if offres_publiees_expirees:
+    problemes.append(
+        '%d offre(s) encore marquee(s) publiee(s) ont depasse leur date limite.'
+        % offres_publiees_expirees
+    )
 
 print()
 print('=' * 78)

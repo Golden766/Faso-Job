@@ -487,6 +487,10 @@
   font-weight: var(--fj-weight-bold);
 }
 
+.fj-filter-open__count[hidden] {
+  display: none !important;
+}
+
 @media (min-width: 1024px) {
   .fj-catalogue__mobile-bar {
     display: none;
